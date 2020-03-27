@@ -21,6 +21,9 @@ npm install
 
 * [Node JS](https://nodejs.org/en/docs/) - Backend, Web App, and REST API
 
+## Database Schema
+![alt text](https://raw.githubusercontent.com/wendywu830/CIS550-Project/master/MS2%20ER%20Diagram.png?token=AD6XYBYPMQPY3MQHB2INI6C6Q2P36 "ER Diagram")
+
 ## Authors
 
 * **Allison Zhang** - *Planning In Progress* - [alzhang99](https://github.com/alzhang99)
