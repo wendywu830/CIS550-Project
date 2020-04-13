@@ -5,10 +5,13 @@ oracledb.getConnection({
 	user : credentials.user,
 	password : credentials.password,
 	connectString : credentials.connectString
-}, function(err) {
+}, function(err, connection) {
 	if (err) {
 		console.log(err);
 	} else {
-		console.log('Connected to database.')
+		connection.execute("SELECT * FROM Customer", function(err, result) {
+			if (err) {console.log(err);}
+			else console.log(result.rows);
+		});
 	}
 });
