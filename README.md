@@ -12,10 +12,23 @@ Node.js and maybe SQL stuff
 
 ### Installing
 
-cd into backend and run
+In your terminal, cd into both server and client folders and run
 ```
 npm install
 ```
+in each
+
+Then, run 
+```
+npm start
+```
+in both server and client folders in separate terminal windows
+
+You may also need to run 
+```
+npm install react-scripts --save
+```
+in the client folder
 
 ## Built With
 
