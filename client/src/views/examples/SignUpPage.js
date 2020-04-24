@@ -36,16 +36,16 @@ function submitSignUp(e) {
     return res.json();
   }, err => {
     console.log("Error: " + err);
-    alert("err")
   }).then(result => {
     console.log(result)
-    alert(result); 
-    if (result !== "Duplicate account") {
+    if (result.msg !== "Duplicate") {
       window.location.href = '/'
+    } else {
+      alert("Account with this email already exists!")
+      window.location.href = '/sign-up'
     }
   });
 }
-
 
 function SignUpPage() {
   const [firstFocus, setFirstFocus] = React.useState(false);
