@@ -143,6 +143,47 @@ function searchCityBusiness(req, res) {
   });
 }
 
+//Add Itinerary to Account
+
+
+//Get Itineraries for account
+
+
+//Get the Current Max Itinerary_ID, utilized before making an itinerary to increment
+function getMaxItineraryID(req, res) {
+  var query = `
+    SELECT MAX(Itinerary_ID) as top
+    FROM Itinerary
+  `;
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows);
+        }
+      });
+    }
+  });
+}
+
+//Add Flight to itinerary
+
+
+//Add Business to itinerary
+
+
+//Get Everything from itinerary
+
+/****************
+* TEMP QUERYING *
+*****************/
 
 //TEMPORARY - just to see if user can be signed up
 function getAllCustomers(req, res) {
@@ -174,5 +215,6 @@ module.exports = {
   getAllCustomers: getAllCustomers,
   checkLogin: checkLogin,
   signUp: signUp,
-  searchCityBusiness: searchCityBusiness
+  searchCityBusiness: searchCityBusiness,
+  getMaxItinID: getMaxItineraryID
 }
