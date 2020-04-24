@@ -35,13 +35,7 @@ function IndexHeader() {
         ></div>
         <Container>
           <div className="content-center brand">
-            {/* <img
-              alt="..."
-              className="n-logo"
-              src={require("assets/img/now-logo.png")}
-            ></img> */}
             <h1 className="h1-seo" style={{fontWeight: 700, fontSize: "400%"}}>TRIPPIN'</h1>
-            <p><b>
               come{"  "}
                 <TextLoop interval={[850, 850, 3100]}>
                   <span> explore </span>
@@ -49,30 +43,7 @@ function IndexHeader() {
                   <span style={{fontWeight: 700}}>travel</span>
                 </TextLoop>{"  "}
                  with us.
-            </b></p>
           </div>
-          {/* <h6 className="category category-absolute">
-            Designed by{" "}
-            <a href="http://invisionapp.com/?ref=creativetim" target="_blank">
-              <img
-                alt="..."
-                className="invision-logo"
-                src={require("assets/img/invision-white-slim.png")}
-              ></img>
-            </a>
-            . Coded by{" "}
-            <a
-              href="https://www.creative-tim.com?ref=nukr-index-header"
-              target="_blank"
-            >
-              <img
-                alt="..."
-                className="creative-tim-logo"
-                src={require("assets/img/creative-tim-white-slim2.png")}
-              ></img>
-            </a>
-            .
-          </h6> */}
         </Container>
       </div>
     </>

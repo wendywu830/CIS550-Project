@@ -3,12 +3,12 @@
 /* ------------------- Route Handlers --------------- */
 /* -------------------------------------------------- */
 
-
 var oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT; //all column names are UPPERCASE!
+oracledb.autoCommit = true;
 var credentials = require('./credentials.json');
 
-
+//Checks if an account with the email already exists
 function checkDuplicate (email, next) {
   var query = `
     SELECT *
@@ -40,6 +40,7 @@ function checkDuplicate (email, next) {
   });
 }
 
+//Creates a user account if the email is not already registered
 function signUp(req, res) {
   let inputEmail = req.body.email
   let name = req.body.first + " " + req.body.last
@@ -47,31 +48,30 @@ function signUp(req, res) {
 
   checkDuplicate (inputEmail, function (isDuplicate) {
     if (isDuplicate !== null) {
-      res.json([isDuplicate])
+      res.json({msg: "Duplicate"})
     } else {
+      //actually inserting new record into DB
       var query = `
         INSERT INTO 
-        Customer 
-        VALUES (:email, :name, :password)
+        Customer (email, name, password)
+        VALUES (:e, :n, :p)
       `;
-      const binds = { email : {val: inputEmail }, password : {val: pass}, name: {val: name}}
+      const binds = [inputEmail, name, pass]
       oracledb.getConnection({
         user : credentials.user,
         password : credentials.password,
         connectString : credentials.connectString
       }, function(err, connection) {
         if (err) {
-          console.log(err);
+          console.log("DB connection err: " + err);
         } else {
           connection.execute(query, binds, function(err, result) {
-            if (err) {console.log(err);}
+            if (err) {console.log("Query err: " + err);}
             else {
               console.log(result.rowsAffected)
               res.json(result)
             }
-          }, 
-          { autoCommit: true }
-          );
+          });
         }
       });
     }
@@ -112,8 +112,8 @@ function checkLogin(req, res) {
   });
 }
 
-
-function searchCity(req, res) {
+//Searchs for businesses in city
+function searchCityBusiness(req, res) {
   var query = `
     SELECT *
     FROM Business
@@ -144,7 +144,7 @@ function searchCity(req, res) {
 }
 
 
-
+//TEMPORARY - just to see if user can be signed up
 function getAllCustomers(req, res) {
   var query = `
     SELECT * 
@@ -174,5 +174,5 @@ module.exports = {
   getAllCustomers: getAllCustomers,
   checkLogin: checkLogin,
   signUp: signUp,
-  searchCity: searchCity
+  searchCityBusiness: searchCityBusiness
 }
