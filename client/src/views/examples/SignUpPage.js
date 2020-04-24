@@ -18,9 +18,6 @@ import {
   Col
 } from "reactstrap";
 
-// core components
-import TransparentFooter from "components/Footers/TransparentFooter.js";
-
 function submitSignUp(e) {
   e.preventDefault();
 
@@ -191,7 +188,6 @@ function SignUpPage() {
             </Col>
           </Container>
         </div>
-        <TransparentFooter />
       </div>
     </>
   );

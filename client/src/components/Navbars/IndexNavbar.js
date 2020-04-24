@@ -55,7 +55,6 @@ function IndexNavbar() {
           <div className="navbar-translate">
             <NavbarBrand
               href="/home"
-              target="_blank"
               id="navbar-brand"
             >
               Home
