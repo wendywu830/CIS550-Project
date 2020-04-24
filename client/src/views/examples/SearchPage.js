@@ -112,6 +112,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                   name="city"
                   placeholder="City"
                   type="text"
+                  required
                 ></Input>
                 </InputGroup>
               </Col>
@@ -126,6 +127,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                     name="state"
                     placeholder="State"
                     type="text"
+                    required
                   ></Input>
                 </InputGroup>
               </Col>   
