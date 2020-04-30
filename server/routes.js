@@ -269,6 +269,124 @@ function searchBusinessByCat(req, res) {
 }
 
 
+//Names of all airports layover stops and business in the city given a source city and dest city
+
+function searchBusinessByCat(req, res) {
+  var query = `
+  WITH source AS (
+    SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a1.city = :source_city
+    ),
+
+    dest AS (
+    SELECT a1.name AS layover_airport, a2.city AS dest
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a2.city = :dest_city
+    )
+
+    SELECT source.layover_airport, source.layover_city, 
+    source.layover_country, b.name as name
+    FROM source JOIN dest 
+    ON source.layover_airport = dest.layover_airport
+    JOIN business b
+    ON source.layover_city = b.city
+    GROUP BY source.layover_airport, source.layover_city, 
+    source.layover_country, name
+    ORDER BY source.layover_city, source.layover_airport;
+    
+  `;
+  let source_city = req.params.source_city;
+  let dest_city = req.params.dest_city;
+  const binds = [source_city, dest_city];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+
+//Names of all airports layover stops and business in the city given a source city and dest city and category of business (eg. Restaurant)
+
+function searchBusinessByCat(req, res) {
+  var query = `
+  WITH source AS (
+    SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a1.city = :source_city
+    ),
+
+    dest AS (
+    SELECT a1.name AS layover_airport, a2.city AS dest
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a2.city = :dest_city
+    )
+
+    SELECT source.layover_airport, source.layover_city, 
+    source.layover_country, b.name as name
+    FROM source JOIN dest 
+    ON source.layover_airport = dest.layover_airport
+    JOIN business b
+    ON source.layover_city = b.city
+    WHERE b.categories LIKE '%=:category%'
+    GROUP BY source.layover_airport, source.layover_city, 
+    source.layover_country, name
+    ORDER BY source.layover_city, source.layover_airport;
+  `;
+  let source_city = req.params.source_city;
+  let dest_city = req.params.dest_city;
+  let category = req.params.category;
+  const binds = [source_city, dest_city, category];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
 
 //Add Itinerary to Account
 
