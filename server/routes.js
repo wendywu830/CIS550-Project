@@ -112,7 +112,7 @@ function checkLogin(req, res) {
   });
 }
 
-//Searchs for businesses in city
+//Searches for businesses in given city, state, minstars
 function searchCityBusiness(req, res) {
   var query = `
     SELECT *
@@ -142,6 +142,133 @@ function searchCityBusiness(req, res) {
     }
   });
 }
+
+//Searchs for top x most popular businesses in given city
+//this is like the previous one so not sure if needed?
+//can hardcode count too if we want
+function searchBusinessOnlyByCity(req, res) {
+  var query = `
+  SELECT * 
+  FROM
+    (SELECT b.name
+    FROM BUSINESS b
+    WHERE b.city=:city
+    ORDER BY b.stars DESC)
+  WHERE ROWNUM <= :=count;
+  `;
+  let city = req.params.city;
+  let count = req.params.count;
+  const binds = [city, count];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+
+//Searches for all the businesses of a particular category (attraction, restaurant, etc) with an average rating higher than x stars in a specific state
+//not sure if im doing the LIKE part correctly with a variable?
+function searchBusinessByCat(req, res) {
+  var query = `
+    SELECT business_id, name
+    FROM business
+    WHERE state = :state
+    AND stars >= :count
+    AND categories LIKE '%:cat%'
+  `;
+  let state = req.params.state;
+  let count = req.params.count;
+  let cat = req.params.cat;
+  const binds = [state, count, cat];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+//Names of all airports layover stops and its city and country given a source city and dest city
+
+function searchBusinessByCat(req, res) {
+  var query = `
+  WITH source AS (
+    SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a1.city = :source_city
+    ),
+
+    dest AS (
+    SELECT a1.name AS layover_airport, a2.city AS dest
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a2.city = :dest_city
+    )
+
+    SELECT source.source, source.layover_airport, source.layover_city, source.layover_country, dest.dest
+    FROM source JOIN dest 
+    ON source.layover_airport = dest.layover_airport
+    GROUP BY layover_airport;
+
+    
+  `;
+  let source_city = req.params.source_city;
+  let dest_city = req.params.dest_city;
+  const binds = [source_city, dest_city];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+
 
 //Add Itinerary to Account
 
