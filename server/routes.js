@@ -216,7 +216,7 @@ function searchBusinessByCat(req, res) {
 
 //Names of all airports layover stops and its city and country given a source city and dest city
 
-function searchBusinessByCat(req, res) {
+function searchLayoverLocations(req, res) {
   var query = `
   WITH source AS (
     SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
@@ -271,7 +271,7 @@ function searchBusinessByCat(req, res) {
 
 //Names of all airports layover stops and business in the city given a source city and dest city
 
-function searchBusinessByCat(req, res) {
+function searchLayoverBusinesses(req, res) {
   var query = `
   WITH source AS (
     SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
@@ -330,7 +330,7 @@ function searchBusinessByCat(req, res) {
 
 //Names of all airports layover stops and business in the city given a source city and dest city and category of business (eg. Restaurant)
 
-function searchBusinessByCat(req, res) {
+function searchLayoverCat(req, res) {
   var query = `
   WITH source AS (
     SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
@@ -387,12 +387,7 @@ function searchBusinessByCat(req, res) {
   });
 }
 
-
-//Add Itinerary to Account
-
-
-//Get Itineraries for account
-
+/******************Itinerary Queries *********************/
 
 //Get the Current Max Itinerary_ID, utilized before making an itinerary to increment
 function getMaxItineraryID(req, res) {
@@ -418,13 +413,201 @@ function getMaxItineraryID(req, res) {
   });
 }
 
-//Add Flight to itinerary
+
+//Add Itinerary to Customer (integrated new intin id into this query)
+function addItinToCust(req, res) {
+  let inputEmail = req.body.email;
+  let name = req.body.name;
+  
+  //actually inserting new record into DB
+  var query = `
+      INSERT INTO ITINERARY (itinerary_id, email, name) 
+      SELECT top + 1, :email, ':name
+      FROM
+      (SELECT MAX(Itinerary_ID) AS top
+      FROM Itinerary) t
+  
+    `;
+    const binds = [inputEmail, name]
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
 
 
-//Add Business to itinerary
+//Add Business to Itinerary_Business 
+function addBusToItin(req, res) {
+  let itin_no = req.body.itin_no;
+  let bus_id = req.body.bus_id;
+  
+  var query = `
+    INSERT INTO itinerarybusiness(itinerary_id, business_id)
+    VALUES(:itin_no, :bus_id)
+  
+    `;
+    const binds = [itin_no, bus_id]
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
+
+  //Add Flight to Itinerary_Flight 
+function addFlightToItin(req, res) {
+  let itin_no = req.body.itin_no;
+  let route_no = req.body.route_no;
+  
+  var query = `
+  INSERT INTO itineraryflight(itinerary_id, route_id)
+	VALUES(:itin_no, :route_no)
+  
+    `;
+    const binds = [itin_no, route_no]
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
+
+  //Get Itineraries for customer given email
+  function getCustItin(req, res) {
+    var query = `
+      SELECT *
+      FROM itinerary i
+      WHERE i.email = :email
+      ORDER BY i.itinerary_id
+    `;
+    let email = req.params.email;
+    const binds = [email];
+  
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
 
 
-//Get Everything from itinerary
+  //Get all businesses and names given itinerary number
+  function getBusFromItin(req, res) {
+    var query = `
+      SELECT b.name;
+      FROM itinerarybusiness i, business b
+      WHERE i.itinerary_id = :id AND i.business_id = b.business_id
+      ORDER BY  b.name
+    `;
+    let id = req.params.id;
+    const binds = [id];
+  
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
+
+//Get all flights and flight src/dest given itinerary number
+
+function getBusFromItin(req, res) {
+    var query = `
+      SELECT a1.name as Source_Name, a1.city as Source_City, a1.country as 
+      Source_Country ,a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
+      Dest_Country
+      FROM itineraryflight i
+      JOIN routes r ON i.route_id = r.route_id
+      JOIN airports a1 ON r.source_id = a1.id
+      JOIN airports a2 ON r.target_id = a2.id
+      WHERE i.itinerary_id = :id 
+      ORDER BY Source_Name, Source_City, Source_Country, Dest_Name, Dest_City, Dest_Country
+    
+    `;
+    let id = req.params.id;
+    const binds = [id];
+  
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
+
+
 
 /****************
 * TEMP QUERYING *
