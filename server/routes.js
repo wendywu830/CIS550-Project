@@ -174,12 +174,46 @@ function getMaxItineraryID(req, res) {
 }
 
 //Add Flight to itinerary
+function flightAdd(req, res) {
+  let itinerary = req.body.itinerary;
+  let route = req.body.route;
 
+  checkDuplicate (itinerary, function (isDuplicate) {
+    if (isDuplicate !== null) {
+      res.json({msg: "Duplicate"})
+    } else {
+      //actually inserting new record into DB
+      var query = `
+        INSERT INTO 
+        ItineraryFlight (itinerary_id, route_id)
+        VALUES (:i, :r)
+      `;
+      const binds = [itinerary, route]
+      oracledb.getConnection({
+        user : credentials.user,
+        password : credentials.password,
+        connectString : credentials.connectString
+      }, function(err, connection) {
+        if (err) {
+          console.log("DB connection err: " + err);
+        } else {
+          connection.execute(query, binds, function(err, result) {
+            if (err) {console.log("Query err: " + err);}
+            else {
+              console.log(result.rowsAffected);
+            }
+          });
+        }
+      });
+    }
+  })
+}
 
 //Add Business to itinerary
 
 
 //Get Everything from itinerary
+
 
 /****************
 * TEMP QUERYING *
@@ -216,5 +250,6 @@ module.exports = {
   checkLogin: checkLogin,
   signUp: signUp,
   searchCityBusiness: searchCityBusiness,
-  getMaxItinID: getMaxItineraryID
+  getMaxItinID: getMaxItineraryID,
+  addFlight: flightAdd
 }
