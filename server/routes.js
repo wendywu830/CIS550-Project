@@ -112,7 +112,7 @@ function checkLogin(req, res) {
   });
 }
 
-//Searchs for businesses in city
+//Searches for businesses in given city, state, minstars
 function searchCityBusiness(req, res) {
   var query = `
     SELECT *
@@ -143,11 +143,251 @@ function searchCityBusiness(req, res) {
   });
 }
 
-//Add Itinerary to Account
+//Searchs for top x most popular businesses in given city
+//this is like the previous one so not sure if needed?
+//can hardcode count too if we want
+function searchBusinessOnlyByCity(req, res) {
+  var query = `
+  SELECT * 
+  FROM
+    (SELECT b.name
+    FROM BUSINESS b
+    WHERE b.city=:city
+    ORDER BY b.stars DESC)
+  WHERE ROWNUM <= :=count;
+  `;
+  let city = req.params.city;
+  let count = req.params.count;
+  const binds = [city, count];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
 
 
-//Get Itineraries for account
+//Searches for all the businesses of a particular category (attraction, restaurant, etc) with an average rating higher than x stars in a specific state
+//not sure if im doing the LIKE part correctly with a variable?
+function searchBusinessByCat(req, res) {
+  var query = `
+    SELECT business_id, name
+    FROM business
+    WHERE state = :state
+    AND stars >= :count
+    AND categories LIKE '%:cat%'
+  `;
+  let state = req.params.state;
+  let count = req.params.count;
+  let cat = req.params.cat;
+  const binds = [state, count, cat];
 
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+//Names of all airports layover stops and its city and country given a source city and dest city
+
+function searchLayoverLocations(req, res) {
+  var query = `
+  WITH source AS (
+    SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a1.city = :source_city
+    ),
+
+    dest AS (
+    SELECT a1.name AS layover_airport, a2.city AS dest
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a2.city = :dest_city
+    )
+
+    SELECT source.source, source.layover_airport, source.layover_city, source.layover_country, dest.dest
+    FROM source JOIN dest 
+    ON source.layover_airport = dest.layover_airport
+    GROUP BY layover_airport;
+
+    
+  `;
+  let source_city = req.params.source_city;
+  let dest_city = req.params.dest_city;
+  const binds = [source_city, dest_city];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+
+//Names of all airports layover stops and business in the city given a source city and dest city
+
+function searchLayoverBusinesses(req, res) {
+  var query = `
+  WITH source AS (
+    SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a1.city = :source_city
+    ),
+
+    dest AS (
+    SELECT a1.name AS layover_airport, a2.city AS dest
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a2.city = :dest_city
+    )
+
+    SELECT source.layover_airport, source.layover_city, 
+    source.layover_country, b.name as name
+    FROM source JOIN dest 
+    ON source.layover_airport = dest.layover_airport
+    JOIN business b
+    ON source.layover_city = b.city
+    GROUP BY source.layover_airport, source.layover_city, 
+    source.layover_country, name
+    ORDER BY source.layover_city, source.layover_airport;
+    
+  `;
+  let source_city = req.params.source_city;
+  let dest_city = req.params.dest_city;
+  const binds = [source_city, dest_city];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+
+//Names of all airports layover stops and business in the city given a source city and dest city and category of business (eg. Restaurant)
+
+function searchLayoverCat(req, res) {
+  var query = `
+  WITH source AS (
+    SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a1.city = :source_city
+    ),
+
+    dest AS (
+    SELECT a1.name AS layover_airport, a2.city AS dest
+    FROM Routes r 
+    JOIN Airports a1
+    ON r.source_id = a1.id 
+    JOIN Airports a2
+    ON r.target_id = a2.id
+    WHERE a2.city = :dest_city
+    )
+
+    SELECT source.layover_airport, source.layover_city, 
+    source.layover_country, b.name as name
+    FROM source JOIN dest 
+    ON source.layover_airport = dest.layover_airport
+    JOIN business b
+    ON source.layover_city = b.city
+    WHERE b.categories LIKE '%=:category%'
+    GROUP BY source.layover_airport, source.layover_city, 
+    source.layover_country, name
+    ORDER BY source.layover_city, source.layover_airport;
+  `;
+  let source_city = req.params.source_city;
+  let dest_city = req.params.dest_city;
+  let category = req.params.category;
+  const binds = [source_city, dest_city, category];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+/******************Itinerary Queries *********************/
 
 //Get the Current Max Itinerary_ID, utilized before making an itinerary to increment
 function getMaxItineraryID(req, res) {
@@ -173,46 +413,199 @@ function getMaxItineraryID(req, res) {
   });
 }
 
-//Add Flight to itinerary
-function flightAdd(req, res) {
-  let itinerary = req.body.itinerary;
-  let route = req.body.route;
+//Add Itinerary to Customer (integrated new intin id into this query)
+function addItinToCust(req, res) {
+  let inputEmail = req.body.email;
+  let name = req.body.name;
+  
+  //actually inserting new record into DB
+  var query = `
+      INSERT INTO ITINERARY (itinerary_id, email, name) 
+      SELECT top + 1, :email, ':name
+      FROM
+      (SELECT MAX(Itinerary_ID) AS top
+      FROM Itinerary) t
+  
+    `;
+    const binds = [inputEmail, name]
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
 
-  checkDuplicate (itinerary, function (isDuplicate) {
-    if (isDuplicate !== null) {
-      res.json({msg: "Duplicate"})
-    } else {
-      //actually inserting new record into DB
-      var query = `
-        INSERT INTO 
-        ItineraryFlight (itinerary_id, route_id)
-        VALUES (:i, :r)
-      `;
-      const binds = [itinerary, route]
-      oracledb.getConnection({
-        user : credentials.user,
-        password : credentials.password,
-        connectString : credentials.connectString
-      }, function(err, connection) {
-        if (err) {
-          console.log("DB connection err: " + err);
-        } else {
-          connection.execute(query, binds, function(err, result) {
-            if (err) {console.log("Query err: " + err);}
-            else {
-              console.log(result.rowsAffected);
-            }
-          });
-        }
-      });
-    }
-  })
-}
+//Add Business to Itinerary_Business 
+function addBusToItin(req, res) {
+  let itin_no = req.body.itin_no;
+  let bus_id = req.body.bus_id;
+  
+  var query = `
+    INSERT INTO itinerarybusiness(itinerary_id, business_id)
+    VALUES(:itin_no, :bus_id)
+  
+    `;
+    const binds = [itin_no, bus_id]
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
 
-//Add Business to itinerary
+  //Add Flight to Itinerary_Flight 
+function addFlightToItin(req, res) {
+  let itin_no = req.body.itin_no;
+  let route_no = req.body.route_no;
+  
+  var query = `
+  INSERT INTO itineraryflight(itinerary_id, route_id)
+	VALUES(:itin_no, :route_no)
+  
+    `;
+    const binds = [itin_no, route_no]
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
+
+  //Get Itineraries for customer given email
+  function getCustItin(req, res) {
+    var query = `
+      SELECT *
+      FROM itinerary i
+      WHERE i.email = :email
+      ORDER BY i.itinerary_id
+    `;
+    let email = req.params.email;
+    const binds = [email];
+  
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
 
 
-//Get Everything from itinerary
+  //Get all businesses and names given itinerary number
+  function getBusFromItin(req, res) {
+    var query = `
+      SELECT b.name;
+      FROM itinerarybusiness i, business b
+      WHERE i.itinerary_id = :id AND i.business_id = b.business_id
+      ORDER BY  b.name
+    `;
+    let id = req.params.id;
+    const binds = [id];
+  
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
+
+//Get all flights and flight src/dest given itinerary number
+
+function getBusFromItin(req, res) {
+    var query = `
+      SELECT a1.name as Source_Name, a1.city as Source_City, a1.country as 
+      Source_Country ,a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
+      Dest_Country
+      FROM itineraryflight i
+      JOIN routes r ON i.route_id = r.route_id
+      JOIN airports a1 ON r.source_id = a1.id
+      JOIN airports a2 ON r.target_id = a2.id
+      WHERE i.itinerary_id = :id 
+      ORDER BY Source_Name, Source_City, Source_Country, Dest_Name, Dest_City, Dest_Country
+    
+    `;
+    let id = req.params.id;
+    const binds = [id];
+  
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
+
+
 
 
 /****************
