@@ -510,7 +510,7 @@ function addFlightToItin(req, res) {
   }
 
   //Get Itineraries for customer given email
-  function getCustItin(req, res) {
+  function getCustItinByEmail(req, res) {
     var query = `
       SELECT *
       FROM itinerary i
@@ -541,7 +541,7 @@ function addFlightToItin(req, res) {
 
 
   //Get all businesses and names given itinerary number
-  function getBusFromItin(req, res) {
+  function getBusFromItinByNum(req, res) {
     var query = `
       SELECT b.name;
       FROM itinerarybusiness i, business b
@@ -570,9 +570,43 @@ function addFlightToItin(req, res) {
     });
   }
 
-//Get all flights and flight src/dest given itinerary number
+  //Get all itins and businesses given email
+  function getBusFromItinByEmail(req, res) {
+    var query = `
+      SELECT i.itinerary_id, i.name as itinerary_name, b.name as business_name
+      FROM itinerary i
+      JOIN itinerarybusiness ib 
+      ON i.email = :email AND i.itinerary_id=ib.itinerary_id
+      JOIN business b 
+      ON ib.business_id = b.business_id
+      ORDER BY i.name;
+    
+    `;
+    let email = req.params.email;
+    const binds = [email];
+  
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log(result.rows)
+            res.json(result.rows)
+          }
+        });
+      }
+    });
+  }
 
-function getBusFromItin(req, res) {
+
+//Get all flights and flight src/dest given itinerary number
+function getBusFromItinByNum(req, res) {
     var query = `
       SELECT a1.name as Source_Name, a1.city as Source_City, a1.country as 
       Source_Country ,a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
@@ -606,6 +640,45 @@ function getBusFromItin(req, res) {
       }
     });
   }
+
+  //Get all itins, flights and flight src/dest given email
+function getBusFromItinByEmail(req, res) {
+  var query = `
+    SELECT i.itinerary_id, i.name as itinerary_name, a1.name as Source_Name, 
+    a1.city as Source_City, a1.country as 
+    Source_Country ,a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
+    Dest_Country
+    FROM itinerary i
+    JOIN itineraryflight if
+    ON i.email = :email AND i.itinerary_id=if.itinerary_id
+    JOIN routes r ON if.route_id = r.route_id
+    JOIN airports a1 ON r.source_id = a1.id
+    JOIN airports a2 ON r.target_id = a2.id
+    ORDER BY itinerary_name, Source_Name, Source_City, Source_Country, Dest_Name, Dest_City, Dest_Country
+  
+  
+  `;
+  let email = req.params.email;
+  const binds = [email];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
 
 
 
