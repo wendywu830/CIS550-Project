@@ -114,10 +114,7 @@ function IndexNavbar() {
                     <i className="now-ui-icons ui-1_send"></i>
                     Flights
                   </DropdownItem>
-                  <DropdownItem
-                    href=""
-                    target="_blank"
-                  >
+                  <DropdownItem to="/rec" tag={Link}>
                     <i className="now-ui-icons business_bulb-63"></i>
                     Recommendations
                   </DropdownItem>

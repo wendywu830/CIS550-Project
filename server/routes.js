@@ -116,8 +116,8 @@ function checkLogin(req, res) {
 function searchCityBusiness(req, res) {
   var query = `
     SELECT *
-    FROM business
-    WHERE (city:city AND state=:st AND stars >= :stars)
+    FROM Business
+    WHERE (city=:city AND state=:st AND stars >= :stars)
     ORDER BY business.name
   `;
   let city = req.params.city
@@ -155,7 +155,7 @@ function searchBusinessOnlyByCity(req, res) {
     FROM BUSINESS b
     WHERE b.city=:city
     ORDER BY b.stars DESC)
-  WHERE ROWNUM <= :count;
+  WHERE ROWNUM <= :count
   `;
   let city = req.params.city;
   let count = req.params.count;
@@ -351,23 +351,27 @@ function searchLayoverCat(req, res) {
     JOIN Airports a2
     ON r.target_id = a2.id
     WHERE a2.city = :dest_city
+    ),
+
+    biz AS (
+      SELECT name, city, stars, business_id
+      FROM business b
+      WHERE b.categories LIKE :category AND stars = :n
     )
 
-    SELECT source.layover_airport, source.layover_city, 
-    source.layover_country, b.name as name
+    SELECT DISTINCT source.layover_airport, source.layover_city, 
+    source.layover_country, b.name as name, b.stars as stars, b.business_id as b_id
     FROM source JOIN dest 
     ON source.layover_airport = dest.layover_airport
-    JOIN business b
+    JOIN biz b
     ON source.layover_city = b.city
-    WHERE b.categories LIKE '%=:category%'
-    GROUP BY source.layover_airport, source.layover_city, 
-    source.layover_country, name
-    ORDER BY source.layover_city, source.layover_airport;
+    WHERE ROWNUM <= :lim
+    ORDER BY source.layover_city, source.layover_airport
   `;
   let source_city = req.params.source_city;
   let dest_city = req.params.dest_city;
-  let category = req.params.category;
-  const binds = [source_city, dest_city, category];
+  let category = "%" + req.params.category + "%";
+  const binds = [source_city, dest_city, category, 5, 20];
 
   oracledb.getConnection({
     user : credentials.user,
@@ -702,7 +706,7 @@ function deleteItinerary(req, res) {
 function getAllCustomers(req, res) {
   var query = `
     SELECT * 
-    FROM Customer
+    FROM Routes
   `;
   oracledb.getConnection({
     user : credentials.user,
@@ -735,5 +739,6 @@ module.exports = {
   addFlightToItin: addFlightToItin,
   getBusFromItinByEmail: getBusFromItinByEmail,
   getFlightFromItinByEmail: getFlightFromItinByEmail,
-  deleteItinerary: deleteItinerary
+  deleteItinerary: deleteItinerary,
+  searchLayoverCategoryBusiness: searchLayoverCat,
 }

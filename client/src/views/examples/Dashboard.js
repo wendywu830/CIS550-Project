@@ -14,7 +14,7 @@ export default class Dashboard extends React.Component {
   // React function that is called when the page load.
   componentDidMount() {
     // Send an HTTP request to the server.
-    fetch("http://localhost:8082/getBusFromItinByNum/15",
+    fetch("http://localhost:8082/getAllCustomers/",
     {
       method: 'GET' // The type of HTTP request.
     }).then(res => {

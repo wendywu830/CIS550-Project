@@ -25,7 +25,7 @@ import {
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 import Tabs from "./Tabs.js"
 
-  export default class SearchPage extends React.Component {
+  export default class ProfilePage extends React.Component {
     constructor(props) {
       super(props);
   

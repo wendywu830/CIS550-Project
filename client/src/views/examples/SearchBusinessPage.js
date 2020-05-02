@@ -67,7 +67,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     let state = e.target.state.value;
     let stars = e.target.stars.value;
 
-    if (!stars.value) {
+    if (stars === undefined) {
       stars = 0;
     }
     
