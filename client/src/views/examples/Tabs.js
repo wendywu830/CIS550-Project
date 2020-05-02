@@ -12,13 +12,15 @@ import {
   TabPane,
   Container,
   Row,
-  Col
+  Col,
+  Button
 } from "reactstrap";
 
 // core components
 
-function Tabs(props) {
+const Tabs = (props) => {
   const [pills, setPills] = React.useState("1");
+  console.log(props)
   return (
     <>
       <Col className="ml-auto mr-auto" md="10" xl="6">
@@ -75,40 +77,23 @@ function Tabs(props) {
               style={{color: '#000000'}}
             >
               <TabPane tabId="pills1">
-                <p>
-                  I think that’s a responsibility that I have, to push
-                  possibilities, to show people, this is the level that
-                  things could be at. So when you get something that has
-                  the name Kanye West on it, it’s supposed to be pushing
-                  the furthest possibilities. I will be the leader of a
-                  company that ends up being worth billions of dollars,
-                  because I got the answers. I understand culture. I am
-                  the nucleus.
-                </p>
+                <h5>
+                  {props.name}
+                </h5>
+                <a href={"/deleteItinerary/" + props.id}>Delete</a>
               </TabPane>
               <TabPane tabId="pills2">
-                <p>
-                  I will be the leader of a company that ends up being
-                  worth billions of dollars, because I got the answers. I
-                  understand culture. I am the nucleus. I think that’s a
-                  responsibility that I have, to push possibilities, to
-                  show people, this is the level that things could be at.
-                  I think that’s a responsibility that I have, to push
-                  possibilities, to show people, this is the level that
-                  things could be at.
-                </p>
+                <span>
+                  <ul>
+                    {props.biz.map(b => <li key={b.BUSINESS_NAME}>{b.BUSINESS_NAME}</li>)}
+                  </ul>
+                </span>
+                
               </TabPane>
               <TabPane tabId="pills3">
-                <p>
-                  I think that’s a responsibility that I have, to push
-                  possibilities, to show people, this is the level that
-                  things could be at. So when you get something that has
-                  the name Kanye West on it, it’s supposed to be pushing
-                  the furthest possibilities. I will be the leader of a
-                  company that ends up being worth billions of dollars,
-                  because I got the answers. I understand culture. I am
-                  the nucleus.
-                </p>
+                <span>
+                  {props.flights.map(f => <p>{f.SOURCE_NAME}</p>)}
+                </span>
               </TabPane>
             </TabContent>
           </CardBody>

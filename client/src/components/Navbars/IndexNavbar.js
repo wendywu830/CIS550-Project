@@ -21,25 +21,25 @@ import {
 function IndexNavbar() {
   const [navbarColor, setNavbarColor] = React.useState("navbar-transparent");
   const [collapseOpen, setCollapseOpen] = React.useState(false);
-  // React.useEffect(() => {
-  //   const updateNavbarColor = () => {
-  //     if (
-  //       document.documentElement.scrollTop > 399 ||
-  //       document.body.scrollTop > 399
-  //     ) {
-  //       setNavbarColor("");
-  //     } else if (
-  //       document.documentElement.scrollTop < 400 ||
-  //       document.body.scrollTop < 400
-  //     ) {
-  //       setNavbarColor("navbar-transparent");
-  //     }
-  //   };
-  //   window.addEventListener("scroll", updateNavbarColor);
-  //   return function cleanup() {
-  //     window.removeEventListener("scroll", updateNavbarColor);
-  //   };
-  // });
+  React.useEffect(() => {
+    const updateNavbarColor = () => {
+      if (
+        document.documentElement.scrollTop > 399 ||
+        document.body.scrollTop > 399
+      ) {
+        setNavbarColor("");
+      } else if (
+        document.documentElement.scrollTop < 400 ||
+        document.body.scrollTop < 400
+      ) {
+        setNavbarColor("navbar-transparent");
+      }
+    };
+    window.addEventListener("scroll", updateNavbarColor);
+    return function cleanup() {
+      window.removeEventListener("scroll", updateNavbarColor);
+    };
+  });
   return (
     <>
       {collapseOpen ? (
@@ -106,16 +106,20 @@ function IndexNavbar() {
                   <p>Let's travel!&nbsp;</p>
                 </DropdownToggle>
                 <DropdownMenu>
-                  <DropdownItem to="/search" tag={Link}>
-                    <i className="now-ui-icons business_chart-pie-36 mr-1"></i>
-                    Search
+                  <DropdownItem to="/search-business" tag={Link}>
+                    <i className="now-ui-icons transportation_air-baloon"></i>
+                    Things to Do
+                  </DropdownItem>
+                  <DropdownItem to="/search-flights" tag={Link}>
+                    <i className="now-ui-icons ui-1_send"></i>
+                    Flights
                   </DropdownItem>
                   <DropdownItem
                     href=""
                     target="_blank"
                   >
-                    <i className="now-ui-icons design_bullet-list-67 mr-1"></i>
-                    Plan
+                    <i className="now-ui-icons business_bulb-63"></i>
+                    Recommendations
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>

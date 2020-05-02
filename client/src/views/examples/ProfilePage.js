@@ -1,5 +1,5 @@
 import React from "react";
-import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import Typed from 'react-typed';
 // reactstrap components
 
 
@@ -23,7 +23,7 @@ import {
 } from "reactstrap";
 
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
-import Tabs from "views/index-sections/Tabs.js"
+import Tabs from "./Tabs.js"
 
   export default class SearchPage extends React.Component {
     constructor(props) {
@@ -31,7 +31,7 @@ import Tabs from "views/index-sections/Tabs.js"
   
       this.state = {
         email: '',
-        itineraries: []
+        itineraryTabs: []
       }
       this.createItinerary = this.createItinerary.bind(this);
       this.getItineraries = this.getItineraries.bind(this);
@@ -46,7 +46,7 @@ import Tabs from "views/index-sections/Tabs.js"
       }
       this.setState({email: email})
       console.log(this.state.email)
-      this.getItineraries()
+      this.getItineraries(email)
     }
   
 
@@ -68,16 +68,53 @@ import Tabs from "views/index-sections/Tabs.js"
       });
     }
 
-    getItineraries() {
-      fetch("http://localhost:8082/getFullItineraries/" + this.state.email,
+    getItineraries(email) {
+      var itineraries = {}
+      fetch("http://localhost:8082/getFlightFromItinByEmail/" + email,
       {
         method: "GET",
       }).then(res => {
         return res.json();
       }, err => {
         console.log("Error: " + err);
-      }).then(result => {
-        console.log(result)
+      }).then(flight_result => {
+        console.log("flight")
+        console.log(flight_result)
+
+        for (let elt in flight_result) {
+          if (!itineraries.hasOwnProperty(elt.ITINERARY_ID)) {
+            itineraries[elt.ITINERARY_ID] = {flights: [], biz: []}
+          }
+          itineraries[elt.ITINERARY_ID]['flights'].push(elt)
+        }
+
+        fetch("http://localhost:8082/getBusFromItinByEmail/" + email,
+        {
+          method: "GET",
+        }).then(res => {
+          return res.json();
+        }, err => {
+          console.log("Error: " + err);
+        }).then(biz_result => {
+          console.log(biz_result)
+          for (let i in biz_result) {
+            var elt = biz_result[i]
+            if (!itineraries.hasOwnProperty(elt.ITINERARY_ID)) {
+              itineraries[elt.ITINERARY_ID] = {flights: [], biz: []}
+            }
+            itineraries[elt.ITINERARY_ID]['biz'].push(elt)
+          }
+          var finalItin = []
+          for (let [key, value] of Object.entries(itineraries)) {
+            let flightList = value['flights']
+            let bizList = value['biz']
+
+            finalItin.push(<Tabs key={key} id={key} name={bizList[0].ITINERARY_NAME} flights={flightList} biz={bizList}></Tabs>)
+          
+            this.setState({itineraryTabs: finalItin})
+          }
+          console.log(finalItin)
+        });
       });
     }
 
@@ -94,7 +131,20 @@ import Tabs from "views/index-sections/Tabs.js"
           ></div>
           <div className="content">
             <Container>
-              <h2><b>My Itineraries</b></h2>
+              
+              
+              <h3 style={{margin: "6px"}}><b>My Itineraries</b></h3>
+              <p><b>
+              <Typed
+                  typeSpeed={50}
+                  backSpeed={50}
+                  strings={["Hey there, " +JSON.parse(localStorage.getItem('name')) +"!" , "Let's travel together! ✈️"]}
+                  backDelay={1000}
+                  loopCount={1}
+                  showCursor
+                  cursorChar="|"
+                />
+              </b></p>
               <Form className="form" onSubmit={this.createItinerary}> 
               <Row>
                 <Col sm="3">
@@ -122,16 +172,14 @@ import Tabs from "views/index-sections/Tabs.js"
                   size="sm"
                   type="submit"
                 >
-                  Create
+                  Create New Itinerary
                 </Button>
                 </Col>       
               </Row>
             </Form>
-              <Row>
-                <Tabs />
-                <Col>
-                </Col>
-              </Row>
+            <Row>
+            {this.state.itineraryTabs.map(tab => <>{tab}</>)}
+            </Row>
             </Container>
           </div>
         </div>

@@ -559,7 +559,7 @@ function addFlightToItin(req, res) {
     `;
     let id = req.params.id;
     const binds = [id];
-  
+    console.log("getBusFromItinByNum")
     oracledb.getConnection({
       user : credentials.user,
       password : credentials.password,
@@ -584,12 +584,11 @@ function addFlightToItin(req, res) {
     var query = `
       SELECT i.itinerary_id, i.name as itinerary_name, b.name as business_name
       FROM itinerary i
-      JOIN itinerarybusiness ib 
-      ON i.email = :email AND i.itinerary_id=ib.itinerary_id
+      LEFT JOIN itinerarybusiness ib 
+      ON i.email = :email AND i.itinerary_id = ib.itinerary_id
       JOIN business b 
       ON ib.business_id = b.business_id
-      ORDER BY i.name;
-    
+      ORDER BY i.name
     `;
     let email = req.params.email;
     const binds = [email];
@@ -605,7 +604,7 @@ function addFlightToItin(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(result.rows)
+            console.log(result)
             res.json(result.rows)
           }
         });
@@ -615,7 +614,7 @@ function addFlightToItin(req, res) {
 
 
 //Get all flights and flight src/dest given itinerary number
-function getBusFromItinByNum(req, res) {
+function getFlightFromItinByNum(req, res) {
     var query = `
       SELECT a1.name as Source_Name, a1.city as Source_City, a1.country as 
       Source_Country ,a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
@@ -630,7 +629,7 @@ function getBusFromItinByNum(req, res) {
     `;
     let id = req.params.id;
     const binds = [id];
-  
+    
     oracledb.getConnection({
       user : credentials.user,
       password : credentials.password,
@@ -651,14 +650,14 @@ function getBusFromItinByNum(req, res) {
   }
 
   //Get all itins, flights and flight src/dest given email
-function getBusFromItinByEmail(req, res) {
+function getFlightFromItinByEmail(req, res) {
   var query = `
     SELECT i.itinerary_id, i.name as itinerary_name, a1.name as Source_Name, 
     a1.city as Source_City, a1.country as 
     Source_Country ,a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
     Dest_Country
     FROM itinerary i
-    JOIN itineraryflight if
+    LEFT JOIN itineraryflight if
     ON i.email = :email AND i.itinerary_id=if.itinerary_id
     JOIN routes r ON if.route_id = r.route_id
     JOIN airports a1 ON r.source_id = a1.id
@@ -681,7 +680,7 @@ function getBusFromItinByEmail(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result.rows)
+          console.log(result)
           res.json(result.rows)
         }
       });
@@ -689,6 +688,9 @@ function getBusFromItinByEmail(req, res) {
   });
 }
 
+//Delete itinerary based on id
+function deleteItinerary(req, res) {
+}
 
 
 /****************
@@ -729,5 +731,8 @@ module.exports = {
   addItinerary: addItinToCust,
   getCustItineraryNames: getCustItineraryNames,
   addBusToItin: addBusToItin,
-  addFlightToItin: addFlightToItin
+  addFlightToItin: addFlightToItin,
+  getBusFromItinByEmail: getBusFromItinByEmail,
+  getFlightFromItinByEmail: getFlightFromItinByEmail,
+  deleteItinerary: deleteItinerary
 }

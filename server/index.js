@@ -25,14 +25,16 @@ app.post('/sign-up', routes.signUp);
 app.get('/search/:city/:state/:stars', routes.searchCityBusiness);
 
 app.get('/addItinerary/:email/:name', routes.addItinerary);
-
-// app.get('/getFullItineraries/:email', routes.getFullItineraries);
  
 app.get('/getCustItineraryNames/:email', routes.getCustItineraryNames)
 
 app.post('/addBusToItin', routes.addBusToItin)
-app.post('/addBusToItin', routes.addFlightToItin)
+app.post('/addFlightToItin', routes.addFlightToItin)
 
+app.get('/getBusFromItinByEmail/:email', routes.getBusFromItinByEmail)
+app.get('/getFlightFromItinByEmail/:email', routes.getFlightFromItinByEmail)
+
+app.get('/deleteItinerary/:id', routes.deleteItinerary)
 
 app.listen(8082, () => {
 	console.log(`Server listening on PORT 8082`);

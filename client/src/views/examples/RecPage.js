@@ -23,7 +23,7 @@ import {FormControl} from "react-bootstrap";
 
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
-  export default class SearchBusinessPage extends React.Component {
+  export default class SearchFlightsPage extends React.Component {
   constructor(props) {
     super(props);
     
@@ -165,101 +165,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
         ></div>
         <div className="content">
           <Container>
-          <Form className="form" onSubmit={this.submitSearch}> 
-            <Row>
-              <Col>
-                <InputGroup className={"no-border input-lg" } >
-                <InputGroupAddon addonType="prepend">
-                  <InputGroupText>
-                    <i className="now-ui-icons ui-1_zoom-bold"></i>
-                  </InputGroupText>
-                </InputGroupAddon>
-                <Input
-                  name="city"
-                  placeholder="City"
-                  type="text"
-                  required
-                ></Input>
-                </InputGroup>
-              </Col>
-              <Col>
-                <InputGroup className={"no-border input-lg" } >
-                  <InputGroupAddon addonType="prepend">
-                    <InputGroupText>
-                      <i className="now-ui-icons location_world"></i>
-                    </InputGroupText>
-                  </InputGroupAddon>
-                  <Input
-                    name="state"
-                    placeholder="State"
-                    type="text"
-                    required
-                  ></Input>
-                </InputGroup>
-              </Col>   
-              <Col sm="2">
-                <InputGroup className={"no-border input-lg" } >
-                  <InputGroupAddon addonType="prepend">
-                    <InputGroupText>
-                      <i className="now-ui-icons ui-2_favourite-28"></i>
-                    </InputGroupText>
-                  </InputGroupAddon>
-                  <Input
-                    name="stars"
-                    placeholder="Min Stars"
-                    type="number"
-                  ></Input>
-                </InputGroup>
-              </Col>
-              <Col sm="1.5">
-               <Button
-                block
-                className="btn-round"
-                color="info"
-                size="sm"
-                type="submit"
-              >
-                Search
-              </Button>
-              </Col>       
-            </Row>
-            </Form>
-          </Container>
-          <Container>
-          <Form className="form" onSubmit={this.addToItinerary}> 
-            <Row>
-              <Col sm="2" >
-              <FormControl as="select" value={this.state.value} onChange={this.handleChange} style={{margin: "12px"}}>
-                {this.state.itineraryOptions}
-              </FormControl>
-              </Col>
-                
-              <Col sm="1.5">
-              <Button
-                  block
-                  className="btn-round"
-                  color="info"
-                  size="sm"
-                  type="submit"
-                >
-                  Add 
-                </Button>
-              </Col>
-            </Row>
-        
-            <Card className="card-login card-plain">
-              {/* <MDBTable maxHeight="50vh" style={{backgroundColor: 'rgba(228, 236, 232, 0.95)'}}>
-                <MDBTableHead columns={this.state.columns} />
-                <MDBTableBody rows={this.state.searchResults} />
-              </MDBTable>  */}
-
-              <MDBDataTable small style={{backgroundColor: 'rgba(228, 236, 232, 0.95)', marginBottom: "90px"}} data={this.state.data}>
-
-              </MDBDataTable>
-
-      
-            </Card>
-          </Form>
+         
           </Container>
         </div>
       </div>
