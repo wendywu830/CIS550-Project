@@ -28,37 +28,29 @@ import "assets/demo/nucleo-icons-page-styles.css";
 import Index from "views/Index.js";
 import LoginPage from "views/examples/LoginPage.js";
 import SignUpPage from "views/examples/SignUpPage.js";
-import SearchPage from "views/examples/SearchPage.js";
+import SearchBusinessPage from "views/examples/SearchBusinessPage.js";
 
 import ProfilePage from "views/examples/ProfilePage.js";
 
 
 
 import Dashboard from "views/examples/Dashboard.js";
+import ProtectedRoute from "./ProtectedRoute.js";
 
 
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
       <Switch>
-        
         <Route path="/home" render={props => <Index {...props} />} />
-        {/* <Route
-          path="/landing-page"
-          render={props => <LandingPage {...props} />}
-        /> */}
-        <Route
-          path="/profile-page"
-          render={props => <ProfilePage {...props} />}
-        />
+        <ProtectedRoute path="/profile" component={ProfilePage} />
 
-        <Route
-          path="/dashboard"
+        <Route path="/dashboard"
           render={props => <Dashboard {...props} />}
         />
         <Route path="/login" render={props => <LoginPage {...props} />} />
         <Route path="/sign-up" render={props => <SignUpPage {...props} />} />
-        <Route path="/search" render={props => <SearchPage {...props} />} />
+        <ProtectedRoute path="/search" component={SearchBusinessPage} />
 
         <Redirect from="/" to="/home" />
       </Switch>

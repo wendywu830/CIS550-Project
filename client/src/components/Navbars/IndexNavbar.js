@@ -17,28 +17,29 @@ import {
   UncontrolledTooltip
 } from "reactstrap";
 
+
 function IndexNavbar() {
   const [navbarColor, setNavbarColor] = React.useState("navbar-transparent");
   const [collapseOpen, setCollapseOpen] = React.useState(false);
-  React.useEffect(() => {
-    const updateNavbarColor = () => {
-      if (
-        document.documentElement.scrollTop > 399 ||
-        document.body.scrollTop > 399
-      ) {
-        setNavbarColor("");
-      } else if (
-        document.documentElement.scrollTop < 400 ||
-        document.body.scrollTop < 400
-      ) {
-        setNavbarColor("navbar-transparent");
-      }
-    };
-    window.addEventListener("scroll", updateNavbarColor);
-    return function cleanup() {
-      window.removeEventListener("scroll", updateNavbarColor);
-    };
-  });
+  // React.useEffect(() => {
+  //   const updateNavbarColor = () => {
+  //     if (
+  //       document.documentElement.scrollTop > 399 ||
+  //       document.body.scrollTop > 399
+  //     ) {
+  //       setNavbarColor("");
+  //     } else if (
+  //       document.documentElement.scrollTop < 400 ||
+  //       document.body.scrollTop < 400
+  //     ) {
+  //       setNavbarColor("navbar-transparent");
+  //     }
+  //   };
+  //   window.addEventListener("scroll", updateNavbarColor);
+  //   return function cleanup() {
+  //     window.removeEventListener("scroll", updateNavbarColor);
+  //   };
+  // });
   return (
     <>
       {collapseOpen ? (
@@ -87,7 +88,7 @@ function IndexNavbar() {
               </NavItem>
               <NavItem>
                 <NavLink
-                  href="/profile-page"
+                  href="/profile"
                 >
                   <i className="now-ui-icons users_circle-08"></i>
                   <p>My Profile</p>

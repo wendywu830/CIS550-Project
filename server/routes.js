@@ -7,6 +7,7 @@ var oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT; //all column names are UPPERCASE!
 oracledb.autoCommit = true;
 var credentials = require('./credentials.json');
+var async = require('async');
 
 //Checks if an account with the email already exists
 function checkDuplicate (email, next) {
@@ -99,7 +100,6 @@ function checkLogin(req, res) {
           console.log(result.rows)
           if (result.rows.length == 1) {
             console.log("logged in!")
-            res.cookie('user', req.body.email, { signed: true, httpOnly: true });
             return res.json(result.rows)
           } else {
             //if wrong password
@@ -154,7 +154,7 @@ function searchBusinessOnlyByCity(req, res) {
     FROM BUSINESS b
     WHERE b.city=:city
     ORDER BY b.stars DESC)
-  WHERE ROWNUM <= :=count;
+  WHERE ROWNUM <= :count;
   `;
   let city = req.params.city;
   let count = req.params.count;
@@ -390,9 +390,9 @@ function searchLayoverCat(req, res) {
 /******************Itinerary Queries *********************/
 
 //Get the Current Max Itinerary_ID, utilized before making an itinerary to increment
-function getMaxItineraryID(req, res) {
+function getMaxItineraryID(req, res, callback) {
   var query = `
-    SELECT MAX(Itinerary_ID) as top
+    SELECT MAX(itinerary_id) as top
     FROM Itinerary
   `;
   oracledb.getConnection({
@@ -407,6 +407,7 @@ function getMaxItineraryID(req, res) {
         if (err) {console.log(err);}
         else {
           console.log(result.rows);
+          callback(result.rows[0].TOP)
         }
       });
     }
@@ -416,19 +417,17 @@ function getMaxItineraryID(req, res) {
 
 //Add Itinerary to Customer (integrated new intin id into this query)
 function addItinToCust(req, res) {
-  let inputEmail = req.body.email;
-  let name = req.body.name;
-  
   //actually inserting new record into DB
-  var query = `
-      INSERT INTO ITINERARY (itinerary_id, email, name) 
-      SELECT top + 1, :email, ':name
-      FROM
-      (SELECT MAX(Itinerary_ID) AS top
-      FROM Itinerary) t
-  
+  getMaxItineraryID(req, res, function (top) {
+    var query = `
+      INSERT INTO 
+      Itinerary (itinerary_id, email, name) 
+      VALUES (:t, :email, :name)
     `;
-    const binds = [inputEmail, name]
+    let inputEmail = req.params.email;
+    let name = req.params.name;
+
+    const binds = [top + 1, inputEmail, name]
     oracledb.getConnection({
       user : credentials.user,
       password : credentials.password,
@@ -440,26 +439,30 @@ function addItinToCust(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(result.rows)
-            res.json(result.rows)
+            console.log(binds);
+            console.log(result)
+            res.json(result)
           }
         });
       }
     });
+  })
+ 
   }
 
 
 //Add Business to Itinerary_Business 
 function addBusToItin(req, res) {
-  let itin_no = req.body.itin_no;
-  let bus_id = req.body.bus_id;
-  
-  var query = `
-    INSERT INTO itinerarybusiness(itinerary_id, business_id)
-    VALUES(:itin_no, :bus_id)
-  
+  var itin_id = req.body.itin_id;
+  let biz_list = req.body.list;
+  console.log(biz_list)
+  async.forEach(biz_list, function(biz_id, xcallback) { // A
+    var query = `
+    INSERT INTO 
+    itinerarybusiness (itinerary_id, business_id)
+    VALUES (:itin_id, :bus_id)
     `;
-    const binds = [itin_no, bus_id]
+    const binds = [itin_id, biz_id]
     oracledb.getConnection({
       user : credentials.user,
       password : credentials.password,
@@ -471,25 +474,31 @@ function addBusToItin(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(result.rows)
-            res.json(result.rows)
+            console.log(result)
+            xcallback();
           }
         });
       }
     });
+    
+  }, function() {
+    res.json({"status": "success"})
+  });
+  
+ 
   }
 
   //Add Flight to Itinerary_Flight 
 function addFlightToItin(req, res) {
-  let itin_no = req.body.itin_no;
-  let route_no = req.body.route_no;
+  let itin_id = req.params.itin_id;
+  let route_no = req.params.route_no;
   
   var query = `
   INSERT INTO itineraryflight(itinerary_id, route_id)
-	VALUES(:itin_no, :route_no)
+	VALUES(:itin_id, :route_no)
   
     `;
-    const binds = [itin_no, route_no]
+    const binds = [itin_id, route_no]
     oracledb.getConnection({
       user : credentials.user,
       password : credentials.password,
@@ -510,12 +519,12 @@ function addFlightToItin(req, res) {
   }
 
   //Get Itineraries for customer given email
-  function getCustItin(req, res) {
+  function getCustItineraryNames(req, res) {
     var query = `
       SELECT *
       FROM itinerary i
       WHERE i.email = :email
-      ORDER BY i.itinerary_id
+      ORDER BY i.itinerary_id DESC
     `;
     let email = req.params.email;
     const binds = [email];
@@ -543,7 +552,7 @@ function addFlightToItin(req, res) {
   //Get all businesses and names given itinerary number
   function getBusFromItin(req, res) {
     var query = `
-      SELECT b.name;
+      SELECT *
       FROM itinerarybusiness i, business b
       WHERE i.itinerary_id = :id AND i.business_id = b.business_id
       ORDER BY  b.name
@@ -572,7 +581,7 @@ function addFlightToItin(req, res) {
 
 //Get all flights and flight src/dest given itinerary number
 
-function getBusFromItin(req, res) {
+function getFlightFromItin(req, res) {
     var query = `
       SELECT a1.name as Source_Name, a1.city as Source_City, a1.country as 
       Source_Country ,a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
@@ -644,5 +653,8 @@ module.exports = {
   checkLogin: checkLogin,
   signUp: signUp,
   searchCityBusiness: searchCityBusiness,
-  getMaxItinID: getMaxItineraryID
+  addItinerary: addItinToCust,
+  getCustItineraryNames: getCustItineraryNames,
+  addBusToItin: addBusToItin,
+  addFlightToItin: addFlightToItin
 }

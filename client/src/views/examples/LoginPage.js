@@ -21,12 +21,10 @@ import {
 export default class LoginPage extends React.Component {
   constructor(props) {
     super(props);
-
-    // The state maintained by this React Component. 
-    // This component maintains the list of people.
     this.state = {
-      people: []
+      email: ""
     }
+    this.submitLogin = this.submitLogin.bind(this);
   }
   
 
@@ -43,6 +41,10 @@ export default class LoginPage extends React.Component {
     }).then(result => {
       //alert(result.length); 
       if (result.length === 1) {
+        this.setState({
+          email: result[0].EMAIL
+        });
+        localStorage.setItem('email', JSON.stringify(this.state.email));
         window.location.href = "/"
       } else {
         window.location.href = "/login"

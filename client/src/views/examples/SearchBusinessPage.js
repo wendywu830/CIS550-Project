@@ -1,5 +1,5 @@
 import React from "react";
-import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import { MDBTable, MDBDataTable, MDBTableBody, MDBTableHead, MDBInput, MDBBtn } from 'mdbreact';
 // reactstrap components
 
 
@@ -10,9 +10,6 @@ import {
   CardBody,
   CardFooter,
   Form,
-  NavbarBrand,
-  Navbar,
-  FormGroup,
   Input,
   InputGroupAddon,
   InputGroupText,
@@ -22,15 +19,26 @@ import {
   Col
 } from "reactstrap";
 
+import {FormControl} from "react-bootstrap";
+
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
-  export default class SearchPage extends React.Component {
+  export default class SearchBusinessPage extends React.Component {
   constructor(props) {
     super(props);
-
+    
     this.state = {
-      searchResults: [],
-      columns: [{
+      email: '',
+      itineraryOptions: [],
+      itinValue: '',
+      rows: [],
+      
+      columns: [
+        {
+        'label': 'Check',
+        'field': 'check'
+        },
+        {
         label: 'Business Name',
         field: 'name',
         sort: 'asc'
@@ -44,18 +52,20 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
         label: 'Stars',
         field: 'stars',
         sort: 'asc'
-      }]
+      }],
+      data: []
     }
     this.submitSearch = this.submitSearch.bind(this);
-  }
+    this.getItineraries = this.getItineraries.bind(this);
+    this.handleChange = this.handleChange.bind(this);
 
+  }
   
   submitSearch(e) {
     e.preventDefault();
     let city = e.target.city.value
     let state = e.target.state.value
     let stars = e.target.stars.value
-    console.log(state)
     fetch("http://localhost:8082/search/" + city + "/" + state + "/" + stars,
     {
       method: "GET",
@@ -64,26 +74,82 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     }, err => {
       console.log("Error: " + err);
     }).then(result => {
-      console.log(result)
-      // let resultTable = result.map((biz, i) => 
-      //   <tr>
-      //     <td>{biz.NAME}</td>
-      //     <td>{biz.ADDRESS}</td>
-      //     <td>{biz.STARS}</td> 
-      //   </tr>
-      // ); //add categories to table later in nicer representation
+
       var resultTable = []
       for (let ind in result) {
         var elt = result[ind]
-        resultTable.push({name: elt.NAME, address: elt.ADDRESS, stars: elt.STARS})
+        var biz_id = elt.BUSINESS_ID
+        resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.NAME}/>, name: elt.NAME, address: elt.ADDRESS, stars: elt.STARS})
       }
 
-      //This saves our HTML representation of the data into the state, which we can call in our render function
-			this.setState({
+      this.setState({
 				searchResults: resultTable
       });
-      console.log(resultTable)
+      this.setState({
+        data: {columns: this.state.columns, rows: resultTable}
+      }) 
     });
+  }
+
+  addToItinerary(e) {
+    let itinName = e.target[0].value
+    let toAddList = []
+    const formData = new FormData(e.target);
+    e.preventDefault();
+    for (var [key, value] of formData.entries()) {
+      toAddList.push(key)
+    }
+    console.log(itinName)
+    console.log(toAddList)
+    fetch("http://localhost:8082/addBusToItin",
+    {
+      method: "POST",
+      body: JSON.stringify({itin_id: itinName, list: toAddList}),
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log("Error: " + err);
+    }).then(result => {
+      console.log(result)
+
+    });
+    
+  }
+
+  getItineraries(email) {
+    fetch("http://localhost:8082/getCustItineraryNames/" + email,
+    {
+      method: "GET",
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log("Error: " + err);
+    }).then(result => {
+      let resOptions = result.map((elt, i) => 
+        <option value={elt.ITINERARY_ID} name={elt.ITINERARY_ID}>{elt.NAME}</option>
+      );
+      this.setState({
+        itineraryOptions: resOptions
+      }) 
+    });
+  }
+
+  handleChange(event) {
+    this.setState({itinValue: event.target.value});
+  }
+
+  componentWillMount(){
+    let email = '';
+    console.log(localStorage.getItem('email'))
+    if (localStorage && localStorage.getItem('email')) {
+      email = JSON.parse(localStorage.getItem('email'));
+    }
+    this.setState({email: email})
+    this.getItineraries(email)
   }
 
   render() {    
@@ -160,17 +226,40 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
             </Form>
           </Container>
           <Container>
+          <Form className="form" onSubmit={this.addToItinerary}> 
+            <Row>
+              <Col sm="2" >
+              <FormControl as="select" value={this.state.value} onChange={this.handleChange} style={{margin: "12px"}}>
+                {this.state.itineraryOptions}
+              </FormControl>
+              </Col>
+                
+              <Col sm="1.5">
+              <Button
+                  block
+                  className="btn-round"
+                  color="info"
+                  size="sm"
+                  type="submit"
+                >
+                  Add 
+                </Button>
+              </Col>
+            </Row>
+        
             <Card className="card-login card-plain">
-              <CardHeader className="text-center">
-                <h4 className="card-title" >Results</h4>
-              </CardHeader>
-              <CardBody>
-              <MDBTable scrollY maxHeight="50vh" style={{backgroundColor: 'rgba(228, 236, 232, 0.95)'}}>
+              {/* <MDBTable maxHeight="50vh" style={{backgroundColor: 'rgba(228, 236, 232, 0.95)'}}>
                 <MDBTableHead columns={this.state.columns} />
                 <MDBTableBody rows={this.state.searchResults} />
-              </MDBTable>
-              </CardBody>
+              </MDBTable>  */}
+
+              <MDBDataTable small style={{backgroundColor: 'rgba(228, 236, 232, 0.95)', marginBottom: "90px"}} data={this.state.data}>
+
+              </MDBDataTable>
+
+      
             </Card>
+          </Form>
           </Container>
         </div>
       </div>
