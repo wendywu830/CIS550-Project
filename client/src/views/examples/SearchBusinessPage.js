@@ -63,9 +63,14 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
   
   submitSearch(e) {
     e.preventDefault();
-    let city = e.target.city.value
-    let state = e.target.state.value
-    let stars = e.target.stars.value
+    let city = e.target.city.value;
+    let state = e.target.state.value;
+    let stars = e.target.stars.value;
+
+    if (!stars.value) {
+      stars = 0;
+    }
+    
     fetch("http://localhost:8082/search/" + city + "/" + state + "/" + stars,
     {
       method: "GET",
