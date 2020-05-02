@@ -116,8 +116,9 @@ function checkLogin(req, res) {
 function searchCityBusiness(req, res) {
   var query = `
     SELECT *
-    FROM Business
-    WHERE (city=:city AND state=:st AND stars >= :stars)
+    FROM business
+    WHERE (city:city AND state=:st AND stars >= :stars)
+    ORDER BY business.name
   `;
   let city = req.params.city
   let state = req.params.state
