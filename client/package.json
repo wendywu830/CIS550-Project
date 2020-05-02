@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "bootstrap-select": "^1.13.16",
     "mdbreact": "^4.25.6",
     "moment": "2.24.0",
     "node-sass": "4.12.0",

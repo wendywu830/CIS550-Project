@@ -1,221 +1,189 @@
 import React from "react";
-
+import Typed from 'react-typed';
 // reactstrap components
+
+
 import {
   Button,
-  NavItem,
-  NavLink,
-  Nav,
-  TabContent,
-  TabPane,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Form,
+  NavbarBrand,
+  Navbar,
+  FormGroup,
+  Input,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroup,
   Container,
   Row,
-  Col,
-  UncontrolledTooltip
+  Col
 } from "reactstrap";
 
-// core components
-import ExamplesNavbar from "components/Navbars/ExamplesNavbar.js";
-import ProfilePageHeader from "components/Headers/ProfilePageHeader.js";
+import IndexNavbar from "components/Navbars/IndexNavbar.js";
+import Tabs from "./Tabs.js"
 
-function ProfilePage() {
-  const [pills, setPills] = React.useState("2");
-  React.useEffect(() => {
-    document.body.classList.add("profile-page");
-    document.body.classList.add("sidebar-collapse");
-    document.documentElement.classList.remove("nav-open");
-    return function cleanup() {
-      document.body.classList.remove("profile-page");
-      document.body.classList.remove("sidebar-collapse");
-    };
-  });
-  return (
-    <>
-      <ExamplesNavbar />
-      <div className="wrapper">
-        <ProfilePageHeader />
-        <div className="section">
-          <Container>
-            <div className="button-container">
-              <Button className="btn-round" color="info" size="lg">
-                Follow
-              </Button>
-              <Button
-                className="btn-round btn-icon"
-                color="default"
-                id="tooltip515203352"
-                size="lg"
-              >
-                <i className="fab fa-twitter"></i>
-              </Button>
-              <UncontrolledTooltip delay={0} target="tooltip515203352">
-                Follow me on Twitter
-              </UncontrolledTooltip>
-              <Button
-                className="btn-round btn-icon"
-                color="default"
-                id="tooltip340339231"
-                size="lg"
-              >
-                <i className="fab fa-instagram"></i>
-              </Button>
-              <UncontrolledTooltip delay={0} target="tooltip340339231">
-                Follow me on Instagram
-              </UncontrolledTooltip>
-            </div>
-            <h3 className="title">About me</h3>
-            <h5 className="description">
-              An artist of considerable range, Ryan — the name taken by
-              Melbourne-raised, Brooklyn-based Nick Murphy — writes, performs
-              and records all of his own music, giving it a warm, intimate feel
-              with a solid groove structure. An artist of considerable range.
-            </h5>
+  export default class ProfilePage extends React.Component {
+    constructor(props) {
+      super(props);
+  
+      this.state = {
+        email: '',
+        itineraryTabs: []
+      }
+      this.createItinerary = this.createItinerary.bind(this);
+      this.getItineraries = this.getItineraries.bind(this);
+    }
+
+
+    componentWillMount(){
+      let email = '';
+      console.log(localStorage.getItem('email'))
+      if (localStorage && localStorage.getItem('email')) {
+        email = JSON.parse(localStorage.getItem('email'));
+      }
+      this.setState({email: email})
+      console.log(this.state.email)
+      this.getItineraries(email)
+    }
+  
+
+    createItinerary(e) {
+      e.preventDefault();
+      let email = this.state.email
+      let name = e.target.name.value
+
+      fetch("http://localhost:8082/addItinerary/" + email + "/" + name,
+      {
+        method: "GET",
+      }).then(res => {
+        return res.json();
+      }, err => {
+        console.log("Error: " + err);
+      }).then(result => {
+        console.log("Itin created")
+        console.log(result)
+      });
+    }
+
+    getItineraries(email) {
+      var itineraries = {}
+      fetch("http://localhost:8082/getFlightFromItinByEmail/" + email,
+      {
+        method: "GET",
+      }).then(res => {
+        return res.json();
+      }, err => {
+        console.log("Error: " + err);
+      }).then(flight_result => {
+        console.log("flight")
+        console.log(flight_result)
+
+        for (let elt in flight_result) {
+          if (!itineraries.hasOwnProperty(elt.ITINERARY_ID)) {
+            itineraries[elt.ITINERARY_ID] = {flights: [], biz: []}
+          }
+          itineraries[elt.ITINERARY_ID]['flights'].push(elt)
+        }
+
+        fetch("http://localhost:8082/getBusFromItinByEmail/" + email,
+        {
+          method: "GET",
+        }).then(res => {
+          return res.json();
+        }, err => {
+          console.log("Error: " + err);
+        }).then(biz_result => {
+          console.log(biz_result)
+          for (let i in biz_result) {
+            var elt = biz_result[i]
+            if (!itineraries.hasOwnProperty(elt.ITINERARY_ID)) {
+              itineraries[elt.ITINERARY_ID] = {flights: [], biz: []}
+            }
+            itineraries[elt.ITINERARY_ID]['biz'].push(elt)
+          }
+          var finalItin = []
+          for (let [key, value] of Object.entries(itineraries)) {
+            let flightList = value['flights']
+            let bizList = value['biz']
+
+            finalItin.push(<Tabs key={key} id={key} name={bizList[0].ITINERARY_NAME} flights={flightList} biz={bizList}></Tabs>)
+          
+            this.setState({itineraryTabs: finalItin})
+          }
+          console.log(finalItin)
+        });
+      });
+    }
+
+    render() {    
+      return (
+        <>
+        <IndexNavbar />
+        <div className="page-header clear-filter" filter-color="blue">
+          <div
+            className="page-header-image"
+            style={{
+              backgroundImage: "url(" + require("assets/img/header2.jpg") + ")"
+            }}
+          ></div>
+          <div className="content">
+            <Container>
+              
+              
+              <h3 style={{margin: "6px"}}><b>My Itineraries</b></h3>
+              <p><b>
+              <Typed
+                  typeSpeed={50}
+                  backSpeed={50}
+                  strings={["Hey there, " +JSON.parse(localStorage.getItem('name')) +"!" , "Let's travel together! ✈️"]}
+                  backDelay={1000}
+                  loopCount={1}
+                  showCursor
+                  cursorChar="|"
+                />
+              </b></p>
+              <Form className="form" onSubmit={this.createItinerary}> 
+              <Row>
+                <Col sm="3">
+                </Col>
+                <Col sm="5">
+                  <InputGroup className={"no-border input-lg" } >
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
+                      <i className="now-ui-icons ui-1_zoom-bold"></i>
+                    </InputGroupText>
+                  </InputGroupAddon>
+                  <Input
+                    name="name"
+                    placeholder="New Itinerary Name"
+                    type="text"
+                    required
+                  ></Input>
+                  </InputGroup>
+                </Col> 
+                <Col sm="1.5">
+                <Button
+                  block
+                  className="btn-round"
+                  color="info"
+                  size="sm"
+                  type="submit"
+                >
+                  Create New Itinerary
+                </Button>
+                </Col>       
+              </Row>
+            </Form>
             <Row>
-              <Col className="ml-auto mr-auto" md="6">
-                <h4 className="title text-center">My Portfolio</h4>
-                <div className="nav-align-center">
-                  <Nav
-                    className="nav-pills-info nav-pills-just-icons"
-                    pills
-                    role="tablist"
-                  >
-                    <NavItem>
-                      <NavLink
-                        className={pills === "1" ? "active" : ""}
-                        href="#pablo"
-                        onClick={e => {
-                          e.preventDefault();
-                          setPills("1");
-                        }}
-                      >
-                        <i className="now-ui-icons design_image"></i>
-                      </NavLink>
-                    </NavItem>
-                    <NavItem>
-                      <NavLink
-                        className={pills === "2" ? "active" : ""}
-                        href="#pablo"
-                        onClick={e => {
-                          e.preventDefault();
-                          setPills("2");
-                        }}
-                      >
-                        <i className="now-ui-icons location_world"></i>
-                      </NavLink>
-                    </NavItem>
-                    <NavItem>
-                      <NavLink
-                        className={pills === "3" ? "active" : ""}
-                        href="#pablo"
-                        onClick={e => {
-                          e.preventDefault();
-                          setPills("3");
-                        }}
-                      >
-                        <i className="now-ui-icons sport_user-run"></i>
-                      </NavLink>
-                    </NavItem>
-                  </Nav>
-                </div>
-              </Col>
-              <TabContent className="gallery" activeTab={"pills" + pills}>
-                <TabPane tabId="pills1">
-                  <Col className="ml-auto mr-auto" md="10">
-                    <Row className="collections">
-                      <Col md="6">
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg1.jpg")}
-                        ></img>
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg3.jpg")}
-                        ></img>
-                      </Col>
-                      <Col md="6">
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg8.jpg")}
-                        ></img>
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg7.jpg")}
-                        ></img>
-                      </Col>
-                    </Row>
-                  </Col>
-                </TabPane>
-                <TabPane tabId="pills2">
-                  <Col className="ml-auto mr-auto" md="10">
-                    <Row className="collections">
-                      <Col md="6">
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg6.jpg")}
-                        ></img>
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg11.jpg")}
-                        ></img>
-                      </Col>
-                      <Col md="6">
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg7.jpg")}
-                        ></img>
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg8.jpg")}
-                        ></img>
-                      </Col>
-                    </Row>
-                  </Col>
-                </TabPane>
-                <TabPane tabId="pills3">
-                  <Col className="ml-auto mr-auto" md="10">
-                    <Row className="collections">
-                      <Col md="6">
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg3.jpg")}
-                        ></img>
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg8.jpg")}
-                        ></img>
-                      </Col>
-                      <Col md="6">
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg7.jpg")}
-                        ></img>
-                        <img
-                          alt="..."
-                          className="img-raised"
-                          src={require("assets/img/bg6.jpg")}
-                        ></img>
-                      </Col>
-                    </Row>
-                  </Col>
-                </TabPane>
-              </TabContent>
+            {this.state.itineraryTabs.map(tab => <>{tab}</>)}
             </Row>
-          </Container>
+            </Container>
+          </div>
         </div>
-      </div>
-    </>
-  );
-}
-
-export default ProfilePage;
+        </>
+      )
+    }
+  }
