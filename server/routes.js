@@ -643,6 +643,5 @@ module.exports = {
   checkLogin: checkLogin,
   signUp: signUp,
   searchCityBusiness: searchCityBusiness,
-  getMaxItinID: getMaxItineraryID,
-  addFlight: flightAdd
+  getMaxItinID: getMaxItineraryID
 }

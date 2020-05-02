@@ -26,8 +26,6 @@ app.get('/search/:city/:state/:stars', routes.searchCityBusiness);
 
 app.get('/maxItin', routes.getMaxItinID);
 
-app.get('/addFlight/:itinerary/:route/', routes.addFlight);
-
 
 app.listen(8082, () => {
 	console.log(`Server listening on PORT 8082`);
