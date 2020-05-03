@@ -35,10 +35,12 @@ app.get('/getBusFromItinByEmail/:email', routes.getBusFromItinByEmail)
 app.get('/getFlightFromItinByEmail/:email', routes.getFlightFromItinByEmail)
 
 app.get('/searchLayoverCategoryBusiness/:source_city/:dest_city/:category', routes.searchLayoverCategoryBusiness)
+app.get('/searchFlights/:source/:dest/:stops', routes.searchFlights)
 
 app.get('/deleteItinerary/:id', routes.deleteItinerary)
 
 app.get('/getAllCustomers', routes.getAllCustomers)
+
 
 app.listen(8082, () => {
 	console.log(`Server listening on PORT 8082`);

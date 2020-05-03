@@ -213,6 +213,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                     name="stars"
                     placeholder="Min Stars"
                     type="number"
+                    min={0} max={5}
                   ></Input>
                 </InputGroup>
               </Col>
