@@ -17,7 +17,8 @@
     "react-router-dom": "5.0.1",
     "react-scripts": "3.0.1",
     "react-text-loop": "^2.3.0",
-    "reactstrap": "8.0.1"
+    "reactstrap": "8.0.1",
+    "google-maps-react": "*"
   },
   "scripts": {
     "start": "react-scripts start",

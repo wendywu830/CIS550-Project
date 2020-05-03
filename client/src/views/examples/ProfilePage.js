@@ -5,14 +5,7 @@ import Typed from 'react-typed';
 
 import {
   Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
   Form,
-  NavbarBrand,
-  Navbar,
-  FormGroup,
   Input,
   InputGroupAddon,
   InputGroupText,
@@ -79,15 +72,14 @@ import Tabs from "./Tabs.js"
         console.log("Error: " + err);
       }).then(flight_result => {
         console.log("flight")
-        console.log(flight_result)
 
-        for (let elt in flight_result) {
+        for (let i in flight_result) {
+          var elt = flight_result[i]
           if (!itineraries.hasOwnProperty(elt.ITINERARY_ID)) {
             itineraries[elt.ITINERARY_ID] = {flights: [], biz: []}
           }
           itineraries[elt.ITINERARY_ID]['flights'].push(elt)
         }
-
         fetch("http://localhost:8082/getBusFromItinByEmail/" + email,
         {
           method: "GET",
@@ -109,7 +101,13 @@ import Tabs from "./Tabs.js"
             let flightList = value['flights']
             let bizList = value['biz']
 
-            finalItin.push(<Tabs key={key} id={key} name={bizList[0].ITINERARY_NAME} flights={flightList} biz={bizList}></Tabs>)
+            let name = ''
+            if (bizList.length === 0) {
+              name = flightList[0].ITINERARY_NAME
+            } else {
+              name = bizList[0].ITINERARY_NAME
+            }
+            finalItin.push(<Tabs key={key} id={key} name={name} flights={flightList} biz={bizList}></Tabs>)
           
             this.setState({itineraryTabs: finalItin})
           }

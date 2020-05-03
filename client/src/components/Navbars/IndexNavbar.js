@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 // reactstrap components
 import {
-  Button,
   Collapse,
   DropdownToggle,
   DropdownMenu,
@@ -14,9 +13,14 @@ import {
   NavLink,
   Nav,
   Container,
-  UncontrolledTooltip
+  UncontrolledTooltip,
+  Button
 } from "reactstrap";
 
+function logout() {
+  localStorage.clear()
+  window.location.href = "/"
+}
 
 function IndexNavbar() {
   const [navbarColor, setNavbarColor] = React.useState("navbar-transparent");
@@ -128,9 +132,6 @@ function IndexNavbar() {
                   <i className="fab fa-twitter"></i>
                   <p className="d-lg-none d-xl-none">Twitter</p>
                 </NavLink>
-                <UncontrolledTooltip target="#twitter-tooltip">
-                  Follow us on Twitter
-                </UncontrolledTooltip>
               </NavItem>
               <NavItem>
                 <NavLink
@@ -140,9 +141,6 @@ function IndexNavbar() {
                   <i className="fab fa-facebook-square"></i>
                   <p className="d-lg-none d-xl-none">Facebook</p>
                 </NavLink>
-                <UncontrolledTooltip target="#facebook-tooltip">
-                  Like us on Facebook
-                </UncontrolledTooltip>
               </NavItem>
               <NavItem>
                 <NavLink
@@ -152,9 +150,11 @@ function IndexNavbar() {
                   <i className="fab fa-instagram"></i>
                   <p className="d-lg-none d-xl-none">Instagram</p>
                 </NavLink>
-                <UncontrolledTooltip target="#instagram-tooltip">
-                  Follow us on Instagram
-                </UncontrolledTooltip>
+              </NavItem>
+              <NavItem>
+                <NavLink onClick={logout}>
+                <small>Log out</small>
+                </NavLink>
               </NavItem>
             </Nav>
           </Collapse>

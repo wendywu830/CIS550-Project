@@ -31,6 +31,7 @@ app.get('/search/:city/:state/:stars', businessRoutes.searchCityBusiness);
 
 //Flight routes
 app.get('/searchLayoverCat/:source_city/:dest_city/:category', flightRoutes.searchLayoverCat);
+app.get('/searchFlights/:source/:dest/:stops', flightRoutes.searchFlights);
 
 //Itinerary Routes
 app.get('/addItinerary/:email/:name', itineraryRoutes.addItinerary);

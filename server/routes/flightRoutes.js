@@ -25,9 +25,11 @@ var async = require('async');
  * @param dest
  */
 //given source and destination city, search if flight exists and return route id and airline name
- function searchFlightExists(req, res) {
+ function searchFlights(req, res) {
   var query = `
-  SELECT r.route_id, r.source_id, a1.name, r.target_id, a2.name, r.airline_id, al.name AS airline_name
+  SELECT r.route_id AS route_id,
+  r.stops AS stops, a1.name AS source_airport, a2.name AS dest_airport, 
+  al.name AS airline_name
   FROM Routes r 
   JOIN Airports a1
   ON r.source_id = a1.id 
@@ -36,12 +38,13 @@ var async = require('async');
   JOIN Airlines al
   ON r.airline_id = al.airline_id
   WHERE a1.city = :source
-  AND a2.city = :dest
+  AND a2.city = :dest AND r.stops = :stops
   `;
   let source = req.params.source
   let dest = req.params.dest
+  let stops = req.params.stops
 
-  const binds = [source, dest]
+  const binds = [source, dest, stops]
   oracledb.getConnection({
     user : credentials.user,
     password : credentials.password,
@@ -53,7 +56,7 @@ var async = require('async');
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result.rows)
+          //console.log(result.rows)
           res.json(result.rows)
         }
       });
@@ -158,7 +161,7 @@ function searchLayoverBusinesses(req, res) {
     ON source.layover_city = b.city
     GROUP BY source.layover_airport, source.layover_city, 
     source.layover_country, name
-    ORDER BY source.layover_city, source.layover_airport;
+    ORDER BY source.layover_city, source.layover_airport
     
   `;
   let source_city = req.params.source_city;
@@ -212,23 +215,27 @@ function searchLayoverCat(req, res) {
     JOIN Airports a2
     ON r.target_id = a2.id
     WHERE a2.city = :dest_city
+    ),
+    biz AS (
+      SELECT name, city, stars, business_id
+      FROM business b
+      WHERE b.categories LIKE :category AND stars = :n
     )
 
-    SELECT source.layover_airport, source.layover_city, 
-    source.layover_country, b.name as name
+    SELECT DISTINCT source.layover_airport, source.layover_city, 
+    source.layover_country, b.name as name, b.stars as stars, b.business_id as b_id
     FROM source JOIN dest 
     ON source.layover_airport = dest.layover_airport
-    JOIN business b
+    JOIN biz b
     ON source.layover_city = b.city
-    WHERE b.categories LIKE '%=:category%'
-    GROUP BY source.layover_airport, source.layover_city, 
-    source.layover_country, name
-    ORDER BY source.layover_city, source.layover_airport;
+    WHERE ROWNUM <= :lim
+    ORDER BY source.layover_city, source.layover_airport
   `;
   let source_city = req.params.source_city;
   let dest_city = req.params.dest_city;
   let category = req.params.category;
-  const binds = [source_city, dest_city, category];
+  let category = "%" + req.params.category + "%";
+  const binds = [source_city, dest_city, category, 5, 20];
 
   oracledb.getConnection({
     user : credentials.user,
@@ -253,5 +260,6 @@ function searchLayoverCat(req, res) {
  * Exports *
  ***********/
 module.exports = {
-	searchLayoverCat: searchLayoverCat
+	searchLayoverCat: searchLayoverCat,
+  searchFlights: searchFlights
 }

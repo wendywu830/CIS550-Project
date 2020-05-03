@@ -17,6 +17,18 @@ import {
 } from "reactstrap";
 
 // core components
+const deleteItinerary = (itin_id) => {
+  fetch("http://localhost:8082/deleteItinerary/" + itin_id,
+  {
+    method: "GET",
+  }).then(res => {
+    return res.json();
+  }, err => {
+    console.log("Error: " + err);
+  }).then(result => {
+
+  });
+}
 
 const Tabs = (props) => {
   const [pills, setPills] = React.useState("1");
@@ -78,12 +90,16 @@ const Tabs = (props) => {
             >
               <TabPane tabId="pills1">
                 <h5>
-                  {props.name}
+                  <b>{props.name}</b>
                 </h5>
-                <a href={"/deleteItinerary/" + props.id}>Delete</a>
+                <Button className="btn btn-neutral"
+                color="danger"
+                size="sm"
+                style={{}} 
+                onClick={() => deleteItinerary(props.id)}>Delete</Button>
               </TabPane>
               <TabPane tabId="pills2">
-                <span>
+                <span style={{fontSize: "11px"}}>
                   <ul>
                     {props.biz.map(b => <li key={b.BUSINESS_NAME}>{b.BUSINESS_NAME}</li>)}
                   </ul>
@@ -91,8 +107,10 @@ const Tabs = (props) => {
                 
               </TabPane>
               <TabPane tabId="pills3">
-                <span>
-                  {props.flights.map(f => <p>{f.SOURCE_NAME}</p>)}
+                <span style={{fontSize: "11px"}}>
+                  <ul>
+                    {props.flights.map(f =>  <li key={f.SOURCE_NAME}>{f.SOURCE_NAME} <span role="img">✈️</span> {f.DEST_NAME}</li>)}
+                  </ul>
                 </span>
               </TabPane>
             </TabContent>

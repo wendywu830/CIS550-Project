@@ -6,9 +6,6 @@ import { MDBDataTable } from 'mdbreact';
 import {
   Button,
   Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
   Form,
   Input,
   InputGroupAddon,
@@ -35,22 +32,27 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
       
       columns: [
         {
-        'label': 'Check',
-        'field': 'check'
+        label: 'Check',
+        field: 'check'
         },
         {
-        label: 'Business Name',
-        field: 'name',
+        label: 'Source Airport',
+        field: 'source',
         sort: 'asc'
       },
       {
-        label: 'Address',
-        field: 'address',
+        label: 'Destination Airport',
+        field: 'dest',
         sort: 'asc'
       },
       {
-        label: 'Stars',
-        field: 'stars',
+        label: 'Airline',
+        field: 'airline',
+        sort: 'asc'
+      },
+      {
+        label: 'Stops',
+        field: 'stops',
         sort: 'asc'
       }],
       data: []
@@ -63,10 +65,10 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
   
   submitSearch(e) {
     e.preventDefault();
-    let city = e.target.city.value
-    let state = e.target.state.value
-    let stars = e.target.stars.value
-    fetch("http://localhost:8082/search/" + city + "/" + state + "/" + stars,
+    let source_city = e.target.source_city.value
+    let dest_city = e.target.dest_city.value
+    let stops = e.target.stops.value
+    fetch("http://localhost:8082/searchFlights/" + source_city + "/" + dest_city + "/" + stops,
     {
       method: "GET",
     }).then(res => {
@@ -78,13 +80,11 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
       var resultTable = []
       for (let ind in result) {
         var elt = result[ind]
-        var biz_id = elt.BUSINESS_ID
-        resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.NAME}/>, name: elt.NAME, address: elt.ADDRESS, stars: elt.STARS})
+        var route_id = elt.ROUTE_ID
+        resultTable.push({check: <Input type="checkbox" name={route_id} value={elt.NAME}/>, 
+          source: elt.SOURCE_AIRPORT, dest: elt.DEST_AIRPORT, airline: elt.AIRLINE_NAME, stops: elt.STOPS})
       }
 
-      this.setState({
-				searchResults: resultTable
-      });
       this.setState({
         data: {columns: this.state.columns, rows: resultTable}
       }) 
@@ -101,10 +101,10 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     }
     console.log(itinName)
     console.log(toAddList)
-    fetch("http://localhost:8082/addBusToItin",
+    fetch("http://localhost:8082/addFlightToItin",
     {
       method: "POST",
-      body: JSON.stringify({itin_id: itinName, list: toAddList}),
+      body: JSON.stringify({itin_id: itinName, route_list: toAddList}),
       headers: {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
@@ -196,6 +196,21 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                     required
                   ></Input>
                 </InputGroup>
+              </Col> 
+              <Col sm="2">
+                <InputGroup className={"no-border input-lg" } >
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
+                    </InputGroupText>
+                  </InputGroupAddon>
+                  <Input
+                    name="stops"
+                    placeholder="Stops"
+                    type="number"
+                    required
+                    min={0} max={5}
+                  ></Input>
+                </InputGroup>
               </Col>   
               <Col sm="1.5">
                <Button
@@ -235,10 +250,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
         
             <Card className="card-login card-plain">
               <MDBDataTable small style={{backgroundColor: 'rgba(228, 236, 232, 0.95)', marginBottom: "90px"}} data={this.state.data}>
-
               </MDBDataTable>
-
-      
             </Card>
           </Form>
           </Container>

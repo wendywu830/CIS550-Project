@@ -124,15 +124,16 @@ function checkLogin(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result.rows)
-          if (result.rows.length == 1) {
+          //console.log(result.rows)
+          /*if (result.rows.length == 1) {
             console.log("logged in!")
             return res.json(result.rows)
           } else {
             //if wrong password
             console.log("wrong pass "  + req.body.email)
             return res.json(result.rows)
-          }
+          }*/
+          res.json(result.rows);
         }
       });
     }

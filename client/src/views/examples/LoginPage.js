@@ -50,6 +50,7 @@ export default class LoginPage extends React.Component {
         localStorage.setItem('name', JSON.stringify(this.state.name));
         window.location.href = "/"
       } else {
+        alert("Invalid login")
         window.location.href = "/login"
       }
     });

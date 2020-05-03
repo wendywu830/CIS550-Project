@@ -6,6 +6,7 @@ import Typed from 'react-typed';
 
 import {
   Button,
+  UncontrolledTooltip,
   Card,
   CardHeader,
   CardBody,
@@ -284,7 +285,10 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                 style={{color: '#000000'}}
               >
                 <TabPane tabId="iconPills1">
-                  <p>Just feeling spontaneous? Give us your location and we'll tell you the best places to go!</p>
+                  <p>Just feeling spontaneous? Give us your location and we'll tell you the  <span style={{textDecoration: "underline", color:"blue"}} href="#" id="UncontrolledTooltipExample">best</span> places to go!</p>
+                  <UncontrolledTooltip placement="right" target="UncontrolledTooltipExample">
+                    some algo explanation
+                  </UncontrolledTooltip>
                   <Form className="form" onSubmit={{}}>
                     <Row>
                       <Col sm="4">

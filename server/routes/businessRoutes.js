@@ -29,7 +29,7 @@ function searchCityBusiness(req, res) {
   var query = `
     SELECT *
     FROM business
-    WHERE (city:city AND state=:st AND stars >= :stars)
+    WHERE (city=:city AND state=:st AND stars >= :stars)
     ORDER BY business.name
   `;
   let city = req.params.city
@@ -71,7 +71,7 @@ function searchBusinessOnlyByCity(req, res) {
     FROM BUSINESS b
     WHERE b.city=:city
     ORDER BY b.stars DESC)
-  WHERE ROWNUM <= :count;
+    WHERE ROWNUM <= :count
   `;
   let city = req.params.city;
   let count = req.params.count;
@@ -100,7 +100,6 @@ function searchBusinessOnlyByCity(req, res) {
  *
  * Searches for all the businesses of a particular category (attraction, restaurant, etc)
  * with an average rating higher than x stars in a specific state
- * TODO: not sure if im doing the LIKE part correctly with a variable?
  * @param state State
  * @param count Count to return
  * @param cat Category
@@ -111,11 +110,11 @@ function searchBusinessByCat(req, res) {
     FROM business
     WHERE state = :state
     AND stars >= :count
-    AND categories LIKE '%:cat%'
+    AND categories LIKE :cat
   `;
   let state = req.params.state;
   let count = req.params.count;
-  let cat = req.params.cat;
+  let cat = "%" + req.params.cat + "%";
   const binds = [state, count, cat];
 
   oracledb.getConnection({
