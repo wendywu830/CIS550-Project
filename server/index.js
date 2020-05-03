@@ -2,7 +2,10 @@ const cookieParser = require('cookie-parser');
 
 const bodyParser = require('body-parser');
 const express = require('express');
-var routes = require("./routes.js");
+var userRoutes = require('./routes/userRoutes.js');
+var flightRoutes = require('./routes/flightRoutes.js');
+var businessRoutes = require('./routes/businessRoutes.js');
+var itineraryRoutes = require('./routes/itineraryRoutes.js');
 const cors = require('cors');
 const app = express();
 
@@ -16,29 +19,27 @@ app.use(cookieParser('secret'));
 /* ------------------- Route handler registration ----------------- */
 /* ---------------------------------------------------------------- */
 
-app.get('/people', routes.getAllCustomers);
+//User Routes
+//TODO: Which of these do you want
+app.get('/people', userRoutes.getAllCustomers);
+app.get('/getAllCustomers', userRoutes.getAllCustomers);
+app.get('/checklogin/:email/:password', userRoutes.checkLogin)
+app.post('/sign-up', userRoutes.signUp);
 
-app.get('/checklogin/:email/:password', routes.checkLogin)
+//Business Routes 
+app.get('/search/:city/:state/:stars', businessRoutes.searchCityBusiness);
 
-app.post('/sign-up', routes.signUp);
+//Flight routes
+app.get('/searchLayoverCat/:source_city/:dest_city/:category', flightRoutes.searchLayoverCat);
 
-app.get('/search/:city/:state/:stars', routes.searchCityBusiness);
-
-app.get('/addItinerary/:email/:name', routes.addItinerary);
- 
-app.get('/getCustItineraryNames/:email', routes.getCustItineraryNames)
-
-app.post('/addBusToItin', routes.addBusToItin)
-app.post('/addFlightToItin', routes.addFlightToItin)
-
-app.get('/getBusFromItinByEmail/:email', routes.getBusFromItinByEmail)
-app.get('/getFlightFromItinByEmail/:email', routes.getFlightFromItinByEmail)
-
-app.get('/searchLayoverCategoryBusiness/:source_city/:dest_city/:category', routes.searchLayoverCategoryBusiness)
-
-app.get('/deleteItinerary/:id', routes.deleteItinerary)
-
-app.get('/getAllCustomers', routes.getAllCustomers)
+//Itinerary Routes
+app.get('/addItinerary/:email/:name', itineraryRoutes.addItinerary);
+app.get('/getCustItineraryNames/:email', itineraryRoutes.getCustItineraryNames);
+app.post('/addBusToItin', itineraryRoutes.addBusToItin);
+app.post('/addFlightToItin', itineraryRoutes.addFlightToItin);
+app.get('/getBusFromItinByEmail/:email', itineraryRoutes.getBusFromItinByEmail);
+app.get('/getFlightFromItinByEmail/:email', itineraryRoutes.getFlightFromItinByEmail);
+app.get('/deleteItinerary/:id', itineraryRoutes.deleteItinerary)
 
 app.listen(8082, () => {
 	console.log(`Server listening on PORT 8082`);
