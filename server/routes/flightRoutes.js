@@ -233,7 +233,6 @@ function searchLayoverCat(req, res) {
   `;
   let source_city = req.params.source_city;
   let dest_city = req.params.dest_city;
-  let category = req.params.category;
   let category = "%" + req.params.category + "%";
   const binds = [source_city, dest_city, category, 5, 20];
 

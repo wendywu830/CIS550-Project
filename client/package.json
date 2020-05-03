@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "bootstrap-select": "^1.13.16",
+    "google-maps-react": "^2.0.6",
     "mdbreact": "^4.25.6",
     "moment": "2.24.0",
     "node-sass": "4.12.0",
@@ -17,8 +18,8 @@
     "react-router-dom": "5.0.1",
     "react-scripts": "3.0.1",
     "react-text-loop": "^2.3.0",
-    "reactstrap": "8.0.1",
-    "google-maps-react": "*"
+    "react-typed": "^1.2.0",
+    "reactstrap": "8.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

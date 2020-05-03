@@ -262,31 +262,33 @@ function addFlightToItin(req, res) {
   let itin_id = req.body.itin_id;
   let route_list = req.body.route_list;
   async.forEach(route_list, function(route_no, xcallback) { 
-  console.log("inside routes addFlightToItin")
-  var query = `
-    NSERT INTO 
+    console.log("inside routes addFlightToItin")
+
+    var query = `
+    INSERT INTO 
     itineraryflight (itinerary_id, route_id)
     VALUES (:itin_id, :route_no)
-  `;
-  const binds = [itin_id, route_no]
-  console.log(binds)
-  oracledb.getConnection({
-    user : credentials.user,
-    password : credentials.password,
-    connectString : credentials.connectString
-  }, function(err, connection) {
-    if (err) {
-      console.log(err);
-    } else {
-      connection.execute(query, binds, function(err, result) {
-        if (err) {console.log(err);}
-        else {
-          console.log("added flight")
-          console.log(result)
-          xcallback();
-        }
-      });
-    }
+    `;
+    const binds = [itin_id, route_no]
+    console.log(binds)
+    oracledb.getConnection({
+      user : credentials.user,
+      password : credentials.password,
+      connectString : credentials.connectString
+    }, function(err, connection) {
+      if (err) {
+        console.log(err);
+      } else {
+        connection.execute(query, binds, function(err, result) {
+          if (err) {console.log(err);}
+          else {
+            console.log("added flight")
+            console.log(result)
+            xcallback();
+          }
+        });
+      }
+    });
   }, function() {
     res.json({"status": "success"})
   });
@@ -451,7 +453,5 @@ module.exports = {
   addFlightToItin: addFlightToItin,
   getBusFromItinByEmail: getBusFromItinByEmail,
   getFlightFromItinByEmail: getFlightFromItinByEmail,
-  deleteItinerary: deleteItinerary,
-  searchLayoverCategoryBusiness: searchLayoverCat,
-  searchFlights: searchFlights
+  deleteItinerary: deleteItinerary
 }
