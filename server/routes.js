@@ -9,6 +9,11 @@ oracledb.autoCommit = true;
 var credentials = require('./credentials.json');
 var async = require('async');
 
+
+/**************************************************************
+ **********************  LOGIN / SIGNUP  ********************** 
+ **************************************************************/
+
 //Checks if an account with the email already exists
 function checkDuplicate (email, next) {
   var query = `
@@ -112,12 +117,58 @@ function checkLogin(req, res) {
   });
 }
 
+
+/**************************************************************
+ *************************  Flights  ************************* 
+ **************************************************************/
+//given source and destination city, search if flight exists and return route id and airline name
+ function searchFlightExists(req, res) {
+  var query = `
+  SELECT r.route_id, r.source_id, a1.name, r.target_id, a2.name, r.airline_id, al.name AS airline_name
+  FROM Routes r 
+  JOIN Airports a1
+  ON r.source_id = a1.id 
+  JOIN Airports a2
+  ON r.target_id = a2.id
+  JOIN Airlines al
+  ON r.airline_id = al.airline_id
+  WHERE a1.city = :source
+  AND a2.city = :dest
+  `;
+  let source = req.params.source
+  let dest = req.params.dest
+
+  const binds = [source, dest]
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result.rows)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+/**************************************************************
+ ************************  BUSINESSES  ************************ 
+ **************************************************************/
+
+
 //Searches for businesses in given city, state, minstars
 function searchCityBusiness(req, res) {
   var query = `
     SELECT *
-    FROM Business
-    WHERE (city=:city AND state=:st AND stars >= :stars)
+    FROM business
+    WHERE (city:city AND state=:st AND stars >= :stars)
     ORDER BY business.name
   `;
   let city = req.params.city
@@ -155,7 +206,7 @@ function searchBusinessOnlyByCity(req, res) {
     FROM BUSINESS b
     WHERE b.city=:city
     ORDER BY b.stars DESC)
-  WHERE ROWNUM <= :count
+  WHERE ROWNUM <= :count;
   `;
   let city = req.params.city;
   let count = req.params.count;
@@ -215,6 +266,11 @@ function searchBusinessByCat(req, res) {
   });
 }
 
+
+
+/**************************************************************
+ *******************  BUSINESSES AND ROUTES  ******************* 
+ **************************************************************/
 //Names of all airports layover stops and its city and country given a source city and dest city
 
 function searchLayoverLocations(req, res) {
@@ -351,27 +407,23 @@ function searchLayoverCat(req, res) {
     JOIN Airports a2
     ON r.target_id = a2.id
     WHERE a2.city = :dest_city
-    ),
-
-    biz AS (
-      SELECT name, city, stars, business_id
-      FROM business b
-      WHERE b.categories LIKE :category AND stars = :n
     )
 
-    SELECT DISTINCT source.layover_airport, source.layover_city, 
-    source.layover_country, b.name as name, b.stars as stars, b.business_id as b_id
+    SELECT source.layover_airport, source.layover_city, 
+    source.layover_country, b.name as name
     FROM source JOIN dest 
     ON source.layover_airport = dest.layover_airport
-    JOIN biz b
+    JOIN business b
     ON source.layover_city = b.city
-    WHERE ROWNUM <= :lim
-    ORDER BY source.layover_city, source.layover_airport
+    WHERE b.categories LIKE '%=:category%'
+    GROUP BY source.layover_airport, source.layover_city, 
+    source.layover_country, name
+    ORDER BY source.layover_city, source.layover_airport;
   `;
   let source_city = req.params.source_city;
   let dest_city = req.params.dest_city;
-  let category = "%" + req.params.category + "%";
-  const binds = [source_city, dest_city, category, 5, 20];
+  let category = req.params.category;
+  const binds = [source_city, dest_city, category];
 
   oracledb.getConnection({
     user : credentials.user,
@@ -392,8 +444,9 @@ function searchLayoverCat(req, res) {
   });
 }
 
-/******************Itinerary Queries *********************/
-
+/**************************************************************
+ *************************  ITINERARY  ************************* 
+ **************************************************************/
 //Get the Current Max Itinerary_ID, utilized before making an itinerary to increment
 function getMaxItineraryID(req, res, callback) {
   var query = `
@@ -691,10 +744,152 @@ function getFlightFromItinByEmail(req, res) {
   });
 }
 
-//Delete itinerary based on id
-function deleteItinerary(req, res) {
+//Delete all businesses from given itinerary id (perform with next 2 queries)
+function deleteAllItinBus(req, res) {
+  var query = `
+    DELETE FROM itinerarybusiness
+    WHERE itinerary_id = :id
+  `;
+  let id = req.params.id;
+  const binds = [id];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
 }
 
+/********************* DELETING FROM ITIN ***********************/
+//Delete all flight from given itinerary id (perform with prev and next query)
+function deleteAllItinFlights(req, res) {
+  var query = `
+    DELETE FROM itineraryflight
+    WHERE itinerary_id = :id
+  `;
+  let id = req.params.id;
+  const binds = [id];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+//Delete itinerary based on id (delete prev 2 queries first)
+function deleteItinerary(req, res) {
+  var query = `
+    DELETE FROM itinerary
+    WHERE itinerary_id = :id
+  `;
+  let id = req.params.id;
+  const binds = [id];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+
+//Delete one flight from itin given itin id and route id
+function deleteOneFlight(req, res) {
+  var query = `
+    DELETE FROM itineraryflight
+    WHERE itinerary_id = :i_id
+    AND route_id = :r_id
+  
+  `;
+  let i_id = req.params.i_id;
+  let r_id = req.params.r_id;
+  const binds = [i_id, r_id];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
+
+//Delete one business from itin given itin id and business id
+function deleteOneFlight(req, res) {
+  var query = `
+    DELETE FROM itinerarybusiness
+    WHERE itinerary_id = :i_id
+    AND business_id = :b_id
+  `;
+  let i_id = req.params.i_id;
+  let b_id = req.params.b_id;
+  const binds = [i_id, b_id];
+
+  oracledb.getConnection({
+    user : credentials.user,
+    password : credentials.password,
+    connectString : credentials.connectString
+  }, function(err, connection) {
+    if (err) {
+      console.log(err);
+    } else {
+      connection.execute(query, binds, function(err, result) {
+        if (err) {console.log(err);}
+        else {
+          console.log(result)
+          res.json(result.rows)
+        }
+      });
+    }
+  });
+}
 
 
 /****************
@@ -705,7 +900,7 @@ function deleteItinerary(req, res) {
 function getAllCustomers(req, res) {
   var query = `
     SELECT * 
-    FROM Routes
+    FROM Customer
   `;
   oracledb.getConnection({
     user : credentials.user,
@@ -738,6 +933,5 @@ module.exports = {
   addFlightToItin: addFlightToItin,
   getBusFromItinByEmail: getBusFromItinByEmail,
   getFlightFromItinByEmail: getFlightFromItinByEmail,
-  deleteItinerary: deleteItinerary,
-  searchLayoverCategoryBusiness: searchLayoverCat,
+  deleteItinerary: deleteItinerary
 }
