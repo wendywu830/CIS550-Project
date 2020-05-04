@@ -257,6 +257,7 @@ function searchLayoverCat(req, res) {
 }
 
 /**
+ * searchFoodDest
  * search best states and country to go to for foodies with direct flight to 
  * dest from src
  * states and country of dest and the number of businesses there with label 
@@ -335,6 +336,7 @@ function searchFoodDest(req, res) {
 }
 
 /**
+ * searchMysteryDest
  * search 5 best businesses, states and country to go from src
  * algo uses best travel categories and finds the number of businesses 
  * in each state- the businesses have stars >= 4 and each given suggestion 
@@ -345,71 +347,65 @@ function searchFoodDest(req, res) {
  */
 function searchMysteryDest(req, res) {
   var query = `
-    SELECT * 
-    FROM
+    SELECT * FROM
 
       (WITH 
+      
       airpSrc AS
-      (SELECT ap.name, ap.id, ap.country, rt.route_id
+      (SELECT ap.id
       FROM airports ap
-      JOIN Routes rt
-      ON ap.city = :source_city
-      AND rt.source_id = ap.id
+      WHERE ap.city = :source_city
       ),
       
+      srcRoutes AS (
+      SELECT routes.target_id
+      FROM airpSrc
+      JOIN routes
+      ON routes.source_id = airpSrc.id
+      ),
+      
+      allRoutes AS
+      (SELECT dest.country, dest.lat, dest.lon
+      FROM srcRoutes r
+      JOIN airports dest
+      ON r.target_id = dest.id),
+      
       bus AS
-      (SELECT name, city, state, lat, lon, business_id, stars
-      FROM business
-      WHERE categories LIKE '%Nightlife%'
-      OR categories LIKE '%Beauty and Spas%'
-      OR categories LIKE '%Bakeries%'
-      OR categories LIKE '%Bars%'
-      OR categories LIKE '%Lounges%'
-      OR categories LIKE '%Active Life%'
-      OR categories LIKE '%Breakfast and Brunch%'
-      OR categories LIKE '%Recreation Centers%'
-      OR categories LIKE '%Breweries%'
-      OR categories LIKE '%Shopping%'
-      AND stars >= 4),
+      (SELECT b.name, b.city, b.state, b.lat, b.lon, b.business_id, b.stars, allRoutes.country
+      FROM allRoutes
+      JOIN business b
+      ON (allRoutes.lat = b.lat AND allRoutes.lon = b.lon)
+      WHERE b.categories LIKE '%Nightlife%'
+      OR b.categories LIKE '%Beauty and Spas%'
+      OR b.categories LIKE '%Bakeries%'
+      OR b.categories LIKE '%Bars%'
+      OR b.categories LIKE '%Lounges%'
+      OR b.categories LIKE '%Active Life%'
+      OR b.categories LIKE '%Breakfast and Brunch%'
+      OR b.categories LIKE '%Recreation Centers%'
+      OR b.categories LIKE '%Breweries%'
+      OR b.categories LIKE '%Shopping%'
+      AND b.stars >= 4),
       
       groupState AS
       (SELECT state, COUNT(business_id) as count
       FROM bus
-      GROUP BY state
-      ORDER BY count DESC, state),
-      
-      airpDest AS
-      (SELECT a.id, a.name, a.city, a.country, a.lat, a.lon
-      FROM airports a
-      ),
+      GROUP BY state),
       
       allTab AS
-      (SELECT DISTINCT(bus.city), groupState.state, bus.name AS bus_name, bus.stars, bus.business_id, groupState.count, 
-      airpDest.name AS airport, airpDest.country, airpDest.id
-      FROM bus
-      JOIN groupState
+      (SELECT bus.city, groupState.state, bus.name, groupState.count, bus.country
+      FROM groupState
+      JOIN bus
       ON bus.state = groupState.state
-      JOIN airpDest
-      ON airpDest.lat = bus.lat AND airpDest.lon = bus.lon 
-      
-      ),
-      
-      distTabl AS (
-      SELECT DISTINCT(allTab.city) AS bus_city, allTab.state AS bus_state, allTab.bus_name, allTab.stars, allTab.count, allTab.airport, 
-      allTab.country, allTab.business_id
-      FROM allTab
-      JOIN Routes r1
-      ON r1.target_ID = allTab.ID
-      JOIN airpSRC
-      ON r1.source_id = airpSrc.id
       WHERE count > 50
       )
-      
-      SELECT DISTINCT(distTabl.bus_state), distTabl.bus_name, distTabl.country
-      FROM distTabl
-      ORDER BY dbms_random.value)
+    
+    SELECT DISTINCT(allTab.state), allTab.country, allTab.name, allTab.count
+    FROM allTab
+    ORDER BY dbms_random.value)
     
     WHERE ROWNUM <= 5
+  
   `;
   let source_city = req.params.source_city;
   const binds = [source_city];
