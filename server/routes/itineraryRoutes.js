@@ -147,16 +147,17 @@ function getBusFromItinByEmail(req, res) {
 //Get all itins, flights and flight src/dest given email
 function getFlightFromItinByEmail(req, res) {
   var query = `
-    SELECT i.itinerary_id, i.name as itinerary_name, a1.name as Source_Name, 
-    a1.city as Source_City, a1.country as 
-    Source_Country, a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
-    Dest_Country
-    FROM itinerary i
-    LEFT OUTER JOIN itineraryflight if
-    ON i.email = :email AND i.itinerary_id=if.itinerary_id
-    JOIN routes r ON if.route_id = r.route_id
-    JOIN airports a1 ON r.source_id = a1.id
-    JOIN airports a2 ON r.target_id = a2.id  
+  SELECT i.itinerary_id, i.name as itinerary_name, a1.name as Source_Name, 
+  a1.city as Source_City, a1.country as 
+  Source_Country, a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
+  Dest_Country, al.name
+  FROM itinerary i
+  LEFT OUTER JOIN itineraryflight if
+  ON i.email = :email AND i.itinerary_id=if.itinerary_id
+  JOIN routes r ON if.route_id = r.route_id
+  JOIN airports a1 ON r.source_id = a1.id
+  JOIN airports a2 ON r.target_id = a2.id  
+  JOIN airlines al ON r.airline_id = al.airline_id
   
   
   `;
