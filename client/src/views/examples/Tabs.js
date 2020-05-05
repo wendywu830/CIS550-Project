@@ -26,7 +26,7 @@ const deleteItinerary = (itin_id) => {
   }, err => {
     console.log("Error: " + err);
   }).then(result => {
-
+    alert("Deleted itinerary!")
   });
 }
 
@@ -109,7 +109,7 @@ const Tabs = (props) => {
               <TabPane tabId="pills3">
                 <span style={{fontSize: "11px"}}>
                   <ul>
-                    {props.flights.map(f =>  <li key={f.SOURCE_NAME}>{f.SOURCE_NAME} <span role="img">✈️</span> {f.DEST_NAME}</li>)}
+                {props.flights.map(f =>  <li key={f.SOURCE_NAME}>{f.SOURCE_NAME} <span role="img">✈️</span> {f.DEST_NAME} on {f.AIRLINE_NAME}</li>)}
                   </ul>
                 </span>
               </TabPane>

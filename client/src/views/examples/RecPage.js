@@ -45,42 +45,17 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     this.getItineraries = this.getItineraries.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.searchLayoverCategory = this.searchLayoverCategory.bind(this)
+    this.searchMysteryDest = this.searchMysteryDest.bind(this)
+    this.searchFoodDest  = this.searchFoodDest.bind(this)
 
   }
-  
-  // submitSearch(e) {
-  //   e.preventDefault();
-  //   let city = e.target.city.value
-  //   let state = e.target.state.value
-  //   let stars = e.target.stars.value
-  //   fetch("http://localhost:8082/search/" + city + "/" + state + "/" + stars,
-  //   {
-  //     method: "GET",
-  //   }).then(res => {
-  //     return res.json();
-  //   }, err => {
-  //     console.log("Error: " + err);
-  //   }).then(result => {
-
-  //     var resultTable = []
-  //     for (let ind in result) {
-  //       var elt = result[ind]
-  //       var biz_id = elt.BUSINESS_ID
-  //       resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.NAME}/>, name: elt.NAME, address: elt.ADDRESS, stars: elt.STARS})
-  //     }
-
-  //     let cols = []
-  //     this.setState({
-  //       data: {columns: cols, rows: resultTable}
-  //     }) 
-  //   });
-  // }
 
   addToItinerary(e) {
+    e.preventDefault();
     let itinName = e.target[0].value
     let toAddList = []
     const formData = new FormData(e.target);
-    e.preventDefault();
+    console.log()
     for (var [key, value] of formData.entries()) {
       toAddList.push(key)
     }
@@ -122,6 +97,114 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
       }) 
     });
   }
+
+
+  searchMysteryDest(e) {
+    e.preventDefault();
+    console.log()
+    if (e.target.source_city === undefined) return;
+    let source_city = e.target.source_city.value;
+
+    fetch("http://localhost:8082/searchMysteryDest/" + source_city,
+    {
+      method: "GET",
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log("Error: " + err);
+    }).then(result => {
+      console.log(result)
+      var resultTable = []
+      for (let ind in result) {
+        var elt = result[ind]
+        var biz_id = elt.B_ID
+        resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.BUSINESS_NAME}/>, 
+        business: elt.BUSINESS_NAME, state: elt.STATE, country: elt.COUNTRY, count: elt.COUNT, stars: elt.STARS})
+      }
+
+      let cols = [
+        {
+          'label': <pre>      </pre>,
+          'field': 'check'
+        },
+        {
+        label: 'State',
+        field: 'state',
+        sort: 'asc'
+      },
+      {
+        label: 'Country',
+        field: 'country',
+        sort: 'asc'
+      },
+      {
+        label: "TRIPPIN'™ Approved Business",
+        field: 'business',
+        sort: 'asc'
+      },
+      {
+        label: "Number of Top Spots",
+        field: 'count',
+        sort: 'asc'
+      },
+
+      {
+        label: 'Stars',
+        field: 'stars',
+        sort: 'asc'
+      },]
+      this.setState({
+        data: {columns: cols, rows: resultTable}
+      }) 
+    });
+  }
+
+  searchFoodDest(e) {
+    e.preventDefault();
+    let source_city = e.target.source_city.value;
+   
+    fetch("http://localhost:8082/searchFoodDest/" + source_city ,
+    {
+      method: "GET",
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log("Error: " + err);
+    }).then(result => {
+      console.log(result)
+      var resultTable = []
+      for (let ind in result) {
+        var elt = result[ind]
+        resultTable.push({ state: elt.STATE, country: elt.COUNTRY, count: elt.BUS_COUNT, direct: "✔"})
+      }
+
+      let cols = [
+        {
+        label: 'State',
+        field: 'state',
+        sort: 'asc'
+      },
+      {
+        label: 'Country',
+        field: 'country',
+        sort: 'asc'
+      },
+      {
+        label: 'Count',
+        field: 'count',
+        sort: 'asc'
+      },
+      {
+        label: 'Direct Flight?',
+        field: 'direct',
+        sort: 'asc'
+      }]
+      this.setState({
+        data: {columns: cols, rows: resultTable}
+      }) 
+    });
+  }
+
 
   searchLayoverCategory(e) {
     e.preventDefault();
@@ -278,18 +361,20 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                 </NavItem>
               </Nav>
             </CardHeader>
-            <CardBody>
+            <CardBody style={{padding: ".85em"}}>
               <TabContent
                 className="text-center"
                 activeTab={"iconPills" + this.state.iconPills}
                 style={{color: '#000000'}}
               >
                 <TabPane tabId="iconPills1">
-                  <p>Just feeling spontaneous? Give us your location and we'll tell you the  <span style={{textDecoration: "underline", color:"blue"}} href="#" id="UncontrolledTooltipExample">best</span> places to go!</p>
-                  <UncontrolledTooltip placement="right" target="UncontrolledTooltipExample">
-                    some algo explanation
+                  <p>Just feeling spontaneous? Give us your location and we'll tell you the&nbsp; 
+                     <span style={{textDecoration: "underline", color:"blue"}} href="#" id="UncontrolledTooltipExample">best</span> place to go!</p>
+                  <UncontrolledTooltip placement="bottom" target="UncontrolledTooltipExample">
+                    We choose places that have the highest rated businesses of popular vacation activities and greatest count of such businesses. 
+                    We then give a random <i>TRIPPIN'™ Approved Business</i> to jumpstart your spontaneous journey!
                   </UncontrolledTooltip>
-                  <Form className="form" onSubmit={{}}>
+                  <Form className="form" onSubmit={this.searchMysteryDest}>
                     <Row>
                       <Col sm="4">
                         <InputGroup className={"no-border input-lg" } >
@@ -317,11 +402,27 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                           Surprise me!
                         </Button >
                       </Col>
+                      <Col sm="3"></Col>
+                      <Form className="form" onSubmit={this.addToItinerary}> 
+                        <FormControl as="select" value={this.state.value} onChange={this.handleChange} style={{margin: "12px"}}>
+                          {this.state.itineraryOptions}
+                        </FormControl>
+                          
+                        <Button
+                            block
+                            className="btn-round"
+                            color="info"
+                            size="sm"
+                            type="submit"
+                          >
+                            Add 
+                          </Button>
+                     </Form>
                     </Row>
                   </Form>
                 </TabPane>
                 <TabPane tabId="iconPills2">
-                  <p>Want to actually enjoy during your layover? Find the best flights with layover stops with top businesses.</p>
+                  <p>Want to actually enjoy during your layover? Find the best places to have have your layover with top businesses.</p>
                   <Form className="form" onSubmit={this.searchLayoverCategory}>
                     <Row>
                       <Col sm="4">
@@ -378,7 +479,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                 </TabPane>
                 <TabPane tabId="iconPills3">
                   <p>Traveling for the food? Find the most accessible destination from your city that has the highest rated restaurants.</p>
-                  <Form className="form" onSubmit={{}}>
+                  <Form className="form" onSubmit={this.searchFoodDest}>
                     <Row>
                       <Col sm="4">
                         <InputGroup className={"no-border input-lg" } >

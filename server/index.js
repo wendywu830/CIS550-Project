@@ -26,12 +26,15 @@ app.get('/getAllCustomers', userRoutes.getAllCustomers);
 app.get('/checklogin/:email/:password', userRoutes.checkLogin)
 app.post('/sign-up', userRoutes.signUp);
 
-//Business Routes 
+//Business / BusinessRoutes 
 app.get('/search/:city/:state/:stars', businessRoutes.searchCityBusiness);
 
 //Flight routes
-app.get('/searchLayoverCat/:source_city/:dest_city/:category', flightRoutes.searchLayoverCat);
+app.get('/searchLayoverCategoryBusiness/:source_city/:dest_city/:category', flightRoutes.searchLayoverCategoryBusiness);
+app.get('/searchMysteryDest/:source_city', flightRoutes.searchMysteryDest);
+app.get('/searchFoodDest/:source_city', flightRoutes.searchFoodDest);
 app.get('/searchFlights/:source/:dest/:stops', flightRoutes.searchFlights);
+
 
 //Itinerary Routes
 app.get('/addItinerary/:email/:name', itineraryRoutes.addItinerary);

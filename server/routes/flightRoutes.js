@@ -19,7 +19,7 @@ var async = require('async');
  **********/
 
 /**
- * searchFlightExists
+ * searchFlights
  * Given source and destination city, search if flight exists and return route id and airline name
  * @param source 
  * @param dest
@@ -195,7 +195,7 @@ function searchLayoverBusinesses(req, res) {
  * @param dest_city Destination City
  * @param category Category of Business
  */
-function searchLayoverCat(req, res) {
+function searchLayoverCategoryBusiness(req, res) {
   var query = `
   WITH source AS (
     SELECT a2.name AS layover_airport, a2.city AS layover_city, a2.country AS layover_country, a1.city AS source
@@ -230,7 +230,7 @@ function searchLayoverCat(req, res) {
     JOIN biz b
     ON source.layover_city = b.city
     WHERE ROWNUM <= :lim
-    ORDER BY source.layover_city, source.layover_airport
+    ORDER BY dbms_random.value
   `;
   let source_city = req.params.source_city;
   let dest_city = req.params.dest_city;
@@ -261,7 +261,7 @@ function searchLayoverCat(req, res) {
  * search best states and country to go to for foodies with direct flight to 
  * dest from src
  * states and country of dest and the number of businesses there with label 
- * restaurant or food with stats >= 3
+ * restaurant or food with stars >= 3
  * @param source_city Source City
  */
 function searchFoodDest(req, res) {
@@ -308,7 +308,7 @@ function searchFoodDest(req, res) {
     WHERE numBusinesses > 50
     ORDER BY numBusinesses DESC)
     
-    SELECT DISTINCT(res.state), res.numBusinesses, res.country
+    SELECT DISTINCT(res.state), res.numBusinesses AS bus_count, res.country
     FROM res
     ORDER BY numBusinesses DESC
   
@@ -376,7 +376,6 @@ function searchMysteryDest(req, res) {
       JOIN business b
       ON (allRoutes.lat = b.lat AND allRoutes.lon = b.lon)
       WHERE b.categories LIKE '%Nightlife%'
-      OR b.categories LIKE '%Beauty and Spas%'
       OR b.categories LIKE '%Bakeries%'
       OR b.categories LIKE '%Bars%'
       OR b.categories LIKE '%Lounges%'
@@ -384,7 +383,6 @@ function searchMysteryDest(req, res) {
       OR b.categories LIKE '%Breakfast and Brunch%'
       OR b.categories LIKE '%Recreation Centers%'
       OR b.categories LIKE '%Breweries%'
-      OR b.categories LIKE '%Shopping%'
       AND b.stars >= 4),
       
       groupState AS
@@ -393,14 +391,14 @@ function searchMysteryDest(req, res) {
       GROUP BY state),
       
       allTab AS
-      (SELECT bus.city, groupState.state, bus.name, groupState.count, bus.country
+      (SELECT bus.city, groupState.state, bus.name, bus.stars, groupState.count, bus.country, bus.business_id
       FROM groupState
       JOIN bus
       ON bus.state = groupState.state
-      WHERE count > 50
+      WHERE count > 50 AND stars >= 4
       )
     
-    SELECT DISTINCT(allTab.state), allTab.country, allTab.name, allTab.count
+    SELECT DISTINCT(allTab.state), allTab.country, allTab.name as business_name, allTab.stars, allTab.business_id as b_id, allTab.count
     FROM allTab
     ORDER BY dbms_random.value)
     
@@ -435,6 +433,9 @@ function searchMysteryDest(req, res) {
  * Exports *
  ***********/
 module.exports = {
-	searchLayoverCat: searchLayoverCat,
-  searchFlights: searchFlights
+  searchFlights: searchFlights,
+  searchMysteryDest: searchMysteryDest,
+  searchFoodDest: searchFoodDest,
+  searchLayoverCategoryBusiness: searchLayoverCategoryBusiness
+
 }
