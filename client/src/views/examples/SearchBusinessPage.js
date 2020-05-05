@@ -131,8 +131,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     for (var [key, value] of formData.entries()) {
       toAddList.push(key)
     }
-    console.log(itinName)
-    console.log(toAddList)
+
     fetch("http://localhost:8082/addBusToItin",
     {
       method: "POST",

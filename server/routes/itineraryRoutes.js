@@ -136,8 +136,7 @@ function getBusFromItinByEmail(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(result)
-            res.json(result.rows)
+              res.json(result.rows)
           }
         });
       }
@@ -173,7 +172,6 @@ function getFlightFromItinByEmail(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           res.json(result.rows)
         }
       });
@@ -208,9 +206,7 @@ function addItinToCust(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(binds);
-            console.log(result)
-            res.json(result)
+              res.json(result)
           }
         });
       }
@@ -242,8 +238,7 @@ function addBusToItin(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(result)
-            xcallback();
+              xcallback();
           }
         });
       }
@@ -282,8 +277,7 @@ function addFlightToItin(req, res) {
           if (err) {console.log(err);}
           else {
             console.log("added flight")
-            console.log(result)
-            xcallback();
+              xcallback();
           }
         });
       }
@@ -346,7 +340,6 @@ function deleteAllItinFlights(req, res, next) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           next()
         }
       });
@@ -376,7 +369,6 @@ function deleteOneFlight(req, res, next) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           res.json(result.rows)
         }
       });
@@ -404,7 +396,6 @@ function deleteAllItinBus(req, res, next) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           next()
         }
       });
@@ -434,7 +425,6 @@ function deleteOneBusiness(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           res.json(result.rows)
         }
       });

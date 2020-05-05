@@ -56,12 +56,11 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     let itinName = e.target[0].value
     let toAddList = []
     const formData = new FormData(e.target);
-    console.log()
+
     for (var [key, value] of formData.entries()) {
       toAddList.push(key)
     }
-    console.log(itinName)
-    console.log(toAddList)
+
     fetch("http://localhost:8082/addBusToItin",
     {
       method: "POST",
@@ -261,7 +260,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     let category = e.target[2].value;
     let source_city = e.target.source_city.value;
     let dest_city = e.target.dest_city.value;
-    console.log(category)
+
     fetch("http://localhost:8082/searchLayoverCategoryBusiness/" + source_city + "/" + dest_city + "/" + category,
     {
       method: "GET",

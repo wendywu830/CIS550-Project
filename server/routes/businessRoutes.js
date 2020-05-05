@@ -48,7 +48,6 @@ function searchCityBusiness(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result.rows)
           res.json(result.rows)
         }
       });
@@ -88,7 +87,6 @@ function searchCityBusinessCat(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result.rows)
           res.json(result.rows)
         }
       });
@@ -129,7 +127,6 @@ function searchBusinessByCat(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result.rows)
           res.json(result.rows)
         }
       });
@@ -206,7 +203,6 @@ function searchRecBusiness(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result.rows)
           res.json(result.rows)
         }
       });
