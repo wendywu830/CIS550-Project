@@ -149,18 +149,22 @@ function searchRecBusiness(req, res) {
     FROM (
       WITH 
       allItinBus AS (
-          SELECT b.business_id, b.city, b.name
-          FROM itinerary i
-          LEFT OUTER JOIN itinerarybusiness ib 
-          ON i.email = :email AND i.itinerary_id = ib.itinerary_id
-          JOIN business b 
-          ON ib.business_id = b.business_id
-      ),
-      
-      oneItinBus AS (
-          SELECT MAX(a.city) AS dest_city
-          FROM allItinBus a
-      ),
+        SELECT b.business_id, b.city, b.name
+        FROM itinerary i
+        LEFT OUTER JOIN itinerarybusiness ib 
+        ON i.email = :email AND i.itinerary_id = ib.itinerary_id
+        JOIN business b 
+        ON ib.business_id = b.business_id
+        ORDER BY dbms_random.value
+    ),
+    
+    oneItinBus AS (
+        SELECT city AS dest_city
+        FROM
+            ( SELECT city FROM allItinBus
+             ORDER BY dbms_random.value )
+        WHERE rownum = 1
+    ),
       
       allBus AS (
           SELECT b.name, b.stars, b.business_id, b.city
