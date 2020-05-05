@@ -28,6 +28,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
       email: '',
       itineraryOptions: [],
       itinValue: '',
+      categoryValue: '',
       rows: [],
       
       columns: [
@@ -55,6 +56,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     this.submitSearch = this.submitSearch.bind(this);
     this.getItineraries = this.getItineraries.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleCatChange = this.handleCatChange.bind(this);
 
   }
   
@@ -63,12 +65,14 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     let city = e.target.city.value;
     let state = e.target.state.value;
     let stars = e.target.stars.value;
+    let category = this.state.categoryValue;
 
     if (stars === undefined) {
       stars = 0;
     }
     
-    fetch("http://localhost:8082/search/" + city + "/" + state + "/" + stars,
+    if (category !== '' && category != 'All') {
+      fetch("http://localhost:8082/searchCityBusinessCat/" + city + "/" + state + "/" + stars + "/" + category,
     {
       method: "GET",
     }).then(res => {
@@ -91,6 +95,32 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
         data: {columns: this.state.columns, rows: resultTable}
       }) 
     });
+    } else {
+      fetch("http://localhost:8082/search/" + city + "/" + state + "/" + stars,
+      {
+        method: "GET",
+      }).then(res => {
+        return res.json();
+      }, err => {
+        console.log("Error: " + err);
+      }).then(result => {
+
+        var resultTable = []
+        for (let ind in result) {
+          var elt = result[ind]
+          var biz_id = elt.BUSINESS_ID
+          resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.NAME}/>, name: elt.NAME, address: elt.ADDRESS, stars: elt.STARS})
+        }
+
+        this.setState({
+          searchResults: resultTable
+        });
+        this.setState({
+          data: {columns: this.state.columns, rows: resultTable}
+        }) 
+      });
+    }
+
   }
 
   addToItinerary(e) {
@@ -142,6 +172,10 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
   handleChange(event) {
     this.setState({itinValue: event.target.value});
+  }
+
+  handleCatChange(event) {
+    this.setState({categoryValue: event.target.value});
   }
 
   componentWillMount(){
@@ -199,6 +233,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                   ></Input>
                 </InputGroup>
               </Col>   
+              
               <Col sm="2">
                 <InputGroup className={"no-border input-lg" } >
                   <InputGroupAddon addonType="prepend">
@@ -213,6 +248,16 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                     min={0} max={5}
                   ></Input>
                 </InputGroup>
+              </Col>
+              <Col sm="2">
+                <FormControl as="select" value={this.state.value} onChange={this.handleCatChange} style={{margin: "12px"}}>
+                  <option value="All" name="rest">All</option>
+                  <option value="Restaurants" name="rest">Restaurants</option>
+                  <option value="Shopping" name="shopping">Shopping</option>
+                  <option value="Nightlife" name="nightlife">Nightlife</option>
+                  <option value="Arts and Entertainment" name="art">Active Life</option>
+                  <option value="Arts and Entertainment" name="art">Breweries</option>
+                </FormControl>
               </Col>
               <Col sm="1.5">
                <Button
@@ -251,16 +296,8 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
             </Row>
         
             <Card className="card-login card-plain">
-              {/* <MDBTable maxHeight="50vh" style={{backgroundColor: 'rgba(228, 236, 232, 0.95)'}}>
-                <MDBTableHead columns={this.state.columns} />
-                <MDBTableBody rows={this.state.searchResults} />
-              </MDBTable>  */}
-
               <MDBDataTable small style={{backgroundColor: 'rgba(228, 236, 232, 0.95)', marginBottom: "90px"}} data={this.state.data}>
-
               </MDBDataTable>
-
-      
             </Card>
           </Form>
           </Container>

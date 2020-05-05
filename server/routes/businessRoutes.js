@@ -56,27 +56,27 @@ function searchCityBusiness(req, res) {
   });
 }
 
+//Searches for businesses in given city, state, minstars
 /**
- * searchBusinessOnlyByCity
- * Searches for top x most popular businesses in given city
- * TODO: this is like the previous one so not sure if needed? can hardcode count too if we want
+ * searchCityBusiness
+ * Searches for businesses in given city and state with minimum number of stars
  * @param city City
- * @param count count of businesses
- */
-function searchBusinessOnlyByCity(req, res) {
+ * @param state State
+ * @param stars Minimum number of stars for a business
+ */ 
+function searchCityBusinessCat(req, res) {
   var query = `
-  SELECT * 
-  FROM
-    (SELECT b.name
-    FROM BUSINESS b
-    WHERE b.city=:city
-    ORDER BY b.stars DESC)
-    WHERE ROWNUM <= :count
+    SELECT *
+    FROM business
+    WHERE city=:city AND state=:st AND stars >= :stars AND categories LIKE :cat
+    ORDER BY business.name
   `;
-  let city = req.params.city;
-  let count = req.params.count;
-  const binds = [city, count];
+  let city = req.params.city
+  let state = req.params.state
+  let stars = req.params.stars
+  let category = "%" + req.params.category + "%"
 
+  const binds = [city, state, stars, category]
   oracledb.getConnection({
     user : credentials.user,
     password : credentials.password,
@@ -95,6 +95,7 @@ function searchBusinessOnlyByCity(req, res) {
     }
   });
 }
+
 
 /**
  *
@@ -140,5 +141,6 @@ function searchBusinessByCat(req, res) {
  * Exports *
  ***********/
 module.exports = {
-	searchCityBusiness: searchCityBusiness
+  searchCityBusiness: searchCityBusiness,
+  searchCityBusinessCat: searchCityBusinessCat
 }

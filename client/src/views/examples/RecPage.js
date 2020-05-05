@@ -101,7 +101,6 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
   searchMysteryDest(e) {
     e.preventDefault();
-    console.log()
     if (e.target.source_city === undefined) return;
     let source_city = e.target.source_city.value;
 
@@ -162,6 +161,47 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
       }) 
     });
   }
+
+  searchSuggest(e) {
+    e.preventDefault();
+
+    fetch("http://localhost:8082/searchSuggest/" + this.state.email,
+    {
+      method: "GET",
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log("Error: " + err);
+    }).then(result => {
+      var resultTable = []
+      for (let ind in result) {
+        var elt = result[ind]
+        var biz_id = elt.B_ID
+        resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.BUSINESS_NAME}/>, 
+        business: elt.BUSINESS_NAME, address: elt.ADDRESS, stars: elt.STARS})
+      }
+
+      let cols = [
+        {
+          'label': <pre>      </pre>,
+          'field': 'check'
+        },
+      {
+        label: "TRIPPIN'™ Approved Business",
+        field: 'business',
+        sort: 'asc'
+      },
+      {
+        label: 'Stars',
+        field: 'stars',
+        sort: 'asc'
+      }]
+      this.setState({
+        data: {columns: cols, rows: resultTable}
+      }) 
+    });
+  }
+
 
   searchFoodDest(e) {
     e.preventDefault();
@@ -490,7 +530,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                 </TabPane>
                 <TabPane tabId="iconPills3">
                   <p>Traveling for the food? Find the most accessible destination from your city that has the highest rated restaurants.</p>
-                  <Form className="form" onSubmit={this.searchFoodDest}>
+                  <Form className="form" onSubmit={this.searchSuggest}>
                     <Row>
                       <Col sm="4">
                         <InputGroup className={"no-border input-lg" } >
@@ -522,7 +562,38 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                   </Form>
                 </TabPane>
                 <TabPane tabId="iconPills4">
-                  <p></p>
+                  <p>Based on the places you've shown interest in, here's some additional businesses you might enjoy!</p>
+
+                  <Form className="form" onSubmit={this.searchFoodDest}>
+                    <Row>
+                      <Col sm="4">
+                        <InputGroup className={"no-border input-lg" } >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="now-ui-icons ui-1_zoom-bold"></i>
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            name="source_city"
+                            placeholder="Source City"
+                            type="text"
+                            required
+                          ></Input>
+                        </InputGroup>
+                      </Col>
+                      <Col sm="1.5">
+                        <Button
+                          block
+                          className="btn-round"
+                          color="info"
+                          size="sm"
+                          type="submit"
+                        >
+                          Search
+                        </Button >
+                      </Col>
+                    </Row>
+                  </Form>
                 </TabPane>
               </TabContent>
             </CardBody>
