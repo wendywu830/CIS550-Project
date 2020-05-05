@@ -281,6 +281,28 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
   }
 
   render() {    
+    let itinSelector = <> </>;
+    if (this.state.iconPills === "1") {
+      itinSelector = <Row>
+          <Col sm="2">
+          <FormControl as="select" value={this.state.value} onChange={this.handleChange} style={{margin: "12px"}}>
+              {this.state.itineraryOptions}
+            </FormControl>
+          </Col>
+          <Col sm="1.5">
+            <Button
+                block
+                className="btn-round"
+                color="info"
+                size="sm"
+                type="submit"
+              >
+                Add 
+              </Button>
+          </Col>
+        </Row>
+    }
+
     return (
       <>
       <IndexNavbar />
@@ -304,7 +326,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                 cursorChar="|"
               />
           </b></p>
-          <Card>
+          <Card style={{margin: "0px"}}>
             <CardHeader>
               <Nav className="justify-content-center" role="tablist" tabs style={{padding:"9px"}}>
                 <NavItem>
@@ -402,22 +424,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                           Surprise me!
                         </Button >
                       </Col>
-                      <Col sm="3"></Col>
-                      <Form className="form" onSubmit={this.addToItinerary}> 
-                        <FormControl as="select" value={this.state.value} onChange={this.handleChange} style={{margin: "12px"}}>
-                          {this.state.itineraryOptions}
-                        </FormControl>
-                          
-                        <Button
-                            block
-                            className="btn-round"
-                            color="info"
-                            size="sm"
-                            type="submit"
-                          >
-                            Add 
-                          </Button>
-                     </Form>
+                      
                     </Row>
                   </Form>
                 </TabPane>
@@ -516,10 +523,10 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
               </TabContent>
             </CardBody>
           </Card> 
-          <MDBDataTable small style={{backgroundColor: 'rgba(228, 236, 232, 0.95)', marginBottom: "90px"}} data={this.state.data}>
-
-           </MDBDataTable>
-
+          <Form className="form" onSubmit={this.addToItinerary}> 
+            {itinSelector}
+            <MDBDataTable small style={{backgroundColor: 'rgba(228, 236, 232, 0.95)', marginBottom: "90px"}} data={this.state.data}></MDBDataTable>
+          </Form>
           </Container>
         </div>
       </div>
