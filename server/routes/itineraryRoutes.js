@@ -136,8 +136,7 @@ function getBusFromItinByEmail(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(result)
-            res.json(result.rows)
+              res.json(result.rows)
           }
         });
       }
@@ -150,15 +149,14 @@ function getFlightFromItinByEmail(req, res) {
     SELECT i.itinerary_id, i.name as itinerary_name, a1.name as Source_Name, 
     a1.city as Source_City, a1.country as 
     Source_Country, a2.name as Dest_Name, a2.city as Dest_City, a2.country as 
-    Dest_Country
+    Dest_Country, al.name as airline_name
     FROM itinerary i
     LEFT OUTER JOIN itineraryflight if
     ON i.email = :email AND i.itinerary_id=if.itinerary_id
     JOIN routes r ON if.route_id = r.route_id
     JOIN airports a1 ON r.source_id = a1.id
     JOIN airports a2 ON r.target_id = a2.id  
-  
-  
+    JOIN airlines al ON r.airline_id = al.airline_id
   `;
   let email = req.params.email;
   const binds = [email];
@@ -174,7 +172,6 @@ function getFlightFromItinByEmail(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           res.json(result.rows)
         }
       });
@@ -209,9 +206,7 @@ function addItinToCust(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(binds);
-            console.log(result)
-            res.json(result)
+              res.json(result)
           }
         });
       }
@@ -243,8 +238,7 @@ function addBusToItin(req, res) {
         connection.execute(query, binds, function(err, result) {
           if (err) {console.log(err);}
           else {
-            console.log(result)
-            xcallback();
+              xcallback();
           }
         });
       }
@@ -283,8 +277,7 @@ function addFlightToItin(req, res) {
           if (err) {console.log(err);}
           else {
             console.log("added flight")
-            console.log(result)
-            xcallback();
+              xcallback();
           }
         });
       }
@@ -318,8 +311,7 @@ function deleteItinerary(req, res) {
           connection.execute(query, binds, function(err, result) {
             if (err) {console.log(err);}
             else {
-              console.log(result)
-              res.json(result.rows)
+              res.json(result)
             }
           });
         }
@@ -348,7 +340,6 @@ function deleteAllItinFlights(req, res, next) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           next()
         }
       });
@@ -378,7 +369,6 @@ function deleteOneFlight(req, res, next) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           res.json(result.rows)
         }
       });
@@ -406,7 +396,6 @@ function deleteAllItinBus(req, res, next) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           next()
         }
       });
@@ -436,7 +425,6 @@ function deleteOneBusiness(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          console.log(result)
           res.json(result.rows)
         }
       });

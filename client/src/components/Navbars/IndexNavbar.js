@@ -13,8 +13,6 @@ import {
   NavLink,
   Nav,
   Container,
-  UncontrolledTooltip,
-  Button
 } from "reactstrap";
 
 function logout() {
@@ -127,7 +125,6 @@ function IndexNavbar() {
               <NavItem>
                 <NavLink
                   target="_blank"
-                  id="twitter-tooltip"
                 >
                   <i className="fab fa-twitter"></i>
                   <p className="d-lg-none d-xl-none">Twitter</p>
@@ -136,7 +133,6 @@ function IndexNavbar() {
               <NavItem>
                 <NavLink
                   target="_blank"
-                  id="facebook-tooltip"
                 >
                   <i className="fab fa-facebook-square"></i>
                   <p className="d-lg-none d-xl-none">Facebook</p>
@@ -145,7 +141,6 @@ function IndexNavbar() {
               <NavItem>
                 <NavLink
                   target="_blank"
-                  id="instagram-tooltip"
                 >
                   <i className="fab fa-instagram"></i>
                   <p className="d-lg-none d-xl-none">Instagram</p>

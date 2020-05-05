@@ -1,5 +1,3 @@
-const cookieParser = require('cookie-parser');
-
 const bodyParser = require('body-parser');
 const express = require('express');
 var userRoutes = require('./routes/userRoutes.js');
@@ -13,25 +11,25 @@ app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-app.use(cookieParser('secret'));
-
 /* ---------------------------------------------------------------- */
 /* ------------------- Route handler registration ----------------- */
 /* ---------------------------------------------------------------- */
 
 //User Routes
-//TODO: Which of these do you want
-app.get('/people', userRoutes.getAllCustomers);
-app.get('/getAllCustomers', userRoutes.getAllCustomers);
 app.get('/checklogin/:email/:password', userRoutes.checkLogin)
 app.post('/sign-up', userRoutes.signUp);
 
-//Business Routes 
+//Business / BusinessRoutes 
 app.get('/search/:city/:state/:stars', businessRoutes.searchCityBusiness);
+app.get('/searchCityBusinessCat/:city/:state/:stars/:category', businessRoutes.searchCityBusinessCat);
+app.get('/searchRecBusiness/:email', businessRoutes.searchRecBusiness)
 
 //Flight routes
-app.get('/searchLayoverCat/:source_city/:dest_city/:category', flightRoutes.searchLayoverCat);
+app.get('/searchLayoverCategoryBusiness/:source_city/:dest_city/:category', flightRoutes.searchLayoverCategoryBusiness);
+app.get('/searchMysteryDest/:source_city', flightRoutes.searchMysteryDest);
+app.get('/searchFoodDest/:source_city', flightRoutes.searchFoodDest);
 app.get('/searchFlights/:source/:dest/:stops', flightRoutes.searchFlights);
+
 
 //Itinerary Routes
 app.get('/addItinerary/:email/:name', itineraryRoutes.addItinerary);

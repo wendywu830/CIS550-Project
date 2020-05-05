@@ -32,7 +32,6 @@ import SearchFlightsPage from "views/examples/SearchFlightsPage.js";
 import RecPage from "views/examples/RecPage.js";
 import ProfilePage from "views/examples/ProfilePage.js";
 
-import Dashboard from "views/examples/Dashboard.js";
 import ProtectedRoute from "./ProtectedRoute.js";
 
 
@@ -43,9 +42,6 @@ ReactDOM.render(
         <Route path="/home" render={props => <Index {...props} />} />
         <ProtectedRoute path="/profile" component={ProfilePage} />
 
-        <Route path="/dashboard"
-          render={props => <Dashboard {...props} />}
-        />
         <Route path="/login" render={props => <LoginPage {...props} />} />
         <Route path="/sign-up" render={props => <SignUpPage {...props} />} />
         <ProtectedRoute path="/search-business" component={SearchBusinessPage} />

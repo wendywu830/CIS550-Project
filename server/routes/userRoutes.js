@@ -124,44 +124,7 @@ function checkLogin(req, res) {
       connection.execute(query, binds, function(err, result) {
         if (err) {console.log(err);}
         else {
-          //console.log(result.rows)
-          /*if (result.rows.length == 1) {
-            console.log("logged in!")
-            return res.json(result.rows)
-          } else {
-            //if wrong password
-            console.log("wrong pass "  + req.body.email)
-            return res.json(result.rows)
-          }*/
           res.json(result.rows);
-        }
-      });
-    }
-  });
-}
-
-/******************
- * Testing Routes *
- ******************/
-//TEMPORARY - just to see if user can be signed up
-function getAllCustomers(req, res) {
-  var query = `
-    SELECT * 
-    FROM Customer
-  `;
-  oracledb.getConnection({
-    user : credentials.user,
-    password : credentials.password,
-    connectString : credentials.connectString
-  }, function(err, connection) {
-    if (err) {
-      console.log(err);
-    } else {
-      connection.execute(query, function(err, result) {
-        if (err) {console.log(err);}
-        else {
-          console.log(result.rows)
-          res.json(result.rows)
         }
       });
     }
@@ -174,5 +137,4 @@ function getAllCustomers(req, res) {
 module.exports = {
 	signUp: signUp,
 	checkLogin: checkLogin,
-	getAllCustomers: getAllCustomers
 }

@@ -56,8 +56,8 @@ import Tabs from "./Tabs.js"
       }, err => {
         console.log("Error: " + err);
       }).then(result => {
-        console.log("Itin created")
-        console.log(result)
+        alert("Itinerary created! Go add some businesses/flights to it!")
+        window.location.href = '/search-business'
       });
     }
 
