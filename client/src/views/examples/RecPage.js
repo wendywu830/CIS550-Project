@@ -41,7 +41,6 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
       itinValue: '',
       data: []
     }
-    // this.submitSearch = this.submitSearch.bind(this);
     this.getItineraries = this.getItineraries.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.searchLayoverCategory = this.searchLayoverCategory.bind(this)
@@ -51,6 +50,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     this.searchRecBusiness = this.searchRecBusiness.bind(this)
   }
 
+  //adds checked businesses to itinerary
   addToItinerary(e) {
     e.preventDefault();
     let itinName = e.target[0].value
@@ -80,6 +80,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     
   }
 
+  //gets all itineraries of the user
   getItineraries(email) {
     fetch("http://localhost:8082/getCustItineraryNames/" + email,
     {
@@ -98,7 +99,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     });
   }
 
-
+  //searches mystery destination based on provided input from user
   searchMysteryDest(e) {
     e.preventDefault();
     if (e.target.source_city === undefined) return;
@@ -162,6 +163,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     });
   }
 
+  //searches mystery destination based on provided input from user
   searchRecBusiness(e) {
     e.preventDefault();
 
@@ -207,7 +209,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     });
   }
 
-
+  //searches food destination based on provided input from user
   searchFoodDest(e) {
     e.preventDefault();
     let source_city = e.target.source_city.value;
@@ -254,7 +256,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     });
   }
 
-
+  //searches layover businesses and places based on provided input from user
   searchLayoverCategory(e) {
     e.preventDefault();
     let category = e.target[2].value;

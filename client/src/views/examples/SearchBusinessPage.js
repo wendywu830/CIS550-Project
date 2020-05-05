@@ -59,7 +59,8 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     this.handleCatChange = this.handleCatChange.bind(this);
 
   }
-  
+
+  //searches business destination based on provided input from user
   submitSearch(e) {
     e.preventDefault();
     let city = e.target.city.value;
@@ -123,6 +124,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
   }
 
+  //adds checked businesses to itinerary based on provided input from user
   addToItinerary(e) {
     let itinName = e.target[0].value
     let toAddList = []
@@ -151,6 +153,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     
   }
 
+  //gets all itineraries of particular users
   getItineraries(email) {
     fetch("http://localhost:8082/getCustItineraryNames/" + email,
     {
