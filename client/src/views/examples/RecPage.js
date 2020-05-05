@@ -119,7 +119,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
         var elt = result[ind]
         var biz_id = elt.B_ID
         resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.BUSINESS_NAME}/>, 
-        business: elt.BUSINESS_NAME, state: elt.STATE, country: elt.COUNTRY, count: elt.COUNT, stars: elt.STARS})
+        business: elt.BUSINESS_NAME, state: elt.STATE, country: elt.COUNTRY, count: elt.COUNT, stars: elt.STARS, direct: "✔"})
       }
 
       let cols = [
@@ -152,7 +152,11 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
         label: 'Stars',
         field: 'stars',
         sort: 'asc'
-      },]
+      },{
+        label: 'Direct Flight?',
+        field: 'direct',
+        sort: 'asc'
+      }]
       this.setState({
         data: {columns: cols, rows: resultTable}
       }) 
@@ -393,7 +397,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                   <p>Just feeling spontaneous? Give us your location and we'll tell you the&nbsp; 
                      <span style={{textDecoration: "underline", color:"blue"}} href="#" id="UncontrolledTooltipExample">best</span> place to go!</p>
                   <UncontrolledTooltip placement="bottom" target="UncontrolledTooltipExample">
-                    We choose places that have the highest rated businesses of popular vacation activities and greatest count of such businesses. 
+                    We choose places that are easily accessible from your current location and have the highest rated businesses of popular vacation activities and greatest count of such businesses. 
                     We then give a random <i>TRIPPIN'™ Approved Business</i> to jumpstart your spontaneous journey!
                   </UncontrolledTooltip>
                   <Form className="form" onSubmit={this.searchMysteryDest}>
