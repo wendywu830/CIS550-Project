@@ -536,7 +536,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                 </TabPane>
                 <TabPane tabId="iconPills3">
                   <p>Traveling for the food? Find the most accessible destination from your city that has the highest rated restaurants.</p>
-                  <Form className="form" onSubmit={this.searchRecBusiness}>
+                  <Form className="form" onSubmit={this.searchFoodDest}>
                     <Row>
                       <Col sm="4">
                         <InputGroup className={"no-border input-lg" } >
