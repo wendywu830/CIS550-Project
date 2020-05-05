@@ -208,6 +208,7 @@ function searchRecBusiness(req, res) {
   });
 }
 
+
 /***********
  * Exports *
  ***********/
