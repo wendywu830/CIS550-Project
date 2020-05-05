@@ -32,7 +32,6 @@ import SearchFlightsPage from "views/examples/SearchFlightsPage.js";
 import RecPage from "views/examples/RecPage.js";
 import ProfilePage from "views/examples/ProfilePage.js";
 
-import Dashboard from "views/examples/Dashboard.js";
 import ProtectedRoute from "./ProtectedRoute.js";
 
 
