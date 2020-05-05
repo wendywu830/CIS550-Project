@@ -144,47 +144,50 @@ function searchBusinessByCat(req, res) {
  */
 function searchRecBusiness(req, res) {
   var query = `
-      SELECT *
-      FROM (
-        WITH 
-        allItinBus AS (
-            SELECT b.business_id, b.city, b.name
-            FROM itinerary i
-            LEFT OUTER JOIN itinerarybusiness ib 
-            ON i.email = :email AND i.itinerary_id = ib.itinerary_id
-            JOIN business b 
-            ON ib.business_id = b.business_id
-        ),
-        
-        oneItinBus AS (
-            SELECT MAX(a.city) AS dest_city
-            FROM allItinBus a
-        ),
-        
-        allBus AS (
-            SELECT b.name, b.stars, b.business_id, b.state
-            FROM business b
-            JOIN oneItinBus o
-            ON b.city = o.dest_city
-            WHERE b.categories LIKE '%Nightlife%'
-            OR b.categories LIKE '%Beauty and Spas%'
-            OR b.categories LIKE '%Bakeries%'
-            OR b.categories LIKE '%Bars%'
-            OR b.categories LIKE '%Lounges%'
-            OR b.categories LIKE '%Breakfast and Brunch%'
-            OR b.categories LIKE '%Recreation Centers%'
-            OR b.categories LIKE '%Breweries%'
-            OR b.categories LIKE '%Shopping%'
-        )
-        
-        SELECT allBus.name, allBus.stars, allBus.business_id, allBus.state
-        FROM allBus, allItinBus, oneItinBus
-        WHERE allBus.name NOT IN allItinBus.name
-        AND allBus.stars = 5
-        ORDER BY dbms_random.value
-        )
+    SELECT *
+    FROM (
+      WITH 
+      allItinBus AS (
+          SELECT b.business_id, b.city, b.name
+          FROM itinerary i
+          LEFT OUTER JOIN itinerarybusiness ib 
+          ON i.email = :email AND i.itinerary_id = ib.itinerary_id
+          JOIN business b 
+          ON ib.business_id = b.business_id
+      ),
       
-      WHERE ROWNUM <= 1
+      oneItinBus AS (
+          SELECT MAX(a.city) AS dest_city
+          FROM allItinBus a
+      ),
+      
+      allBus AS (
+          SELECT b.name, b.stars, b.business_id, b.city
+          FROM business b
+          JOIN oneItinBus o
+          ON b.city = o.dest_city
+          WHERE b.categories LIKE '%Nightlife%'
+          OR b.categories LIKE '%Beauty and Spas%'
+          OR b.categories LIKE '%Bakeries%'
+          OR b.categories LIKE '%Bars%'
+          OR b.categories LIKE '%Lounges%'
+          OR b.categories LIKE '%Breakfast and Brunch%'
+          OR b.categories LIKE '%Recreation Centers%'
+          OR b.categories LIKE '%Breweries%'
+          OR b.categories LIKE '%Shopping%'
+      )
+      
+      SELECT allBus.name, allBus.stars, allBus.business_id, allBus.city
+      FROM allBus, allItinBus
+      WHERE allBus.name NOT IN allItinBus.name
+      AND allBus.stars = 5
+      ORDER BY dbms_random.value
+      )
+    
+    WHERE ROWNUM <= 1
+  
+  
+  
   `;
   let email = req.params.email;
   const binds = [email];
