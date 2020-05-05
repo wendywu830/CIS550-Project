@@ -433,8 +433,6 @@ function searchMysteryDest(req, res) {
   });
 }
 
-
-
 /***********
  * Exports *
  ***********/
