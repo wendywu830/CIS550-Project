@@ -86,12 +86,6 @@ function SignUpPage() {
               <Card className="card-login card-plain">
                 <Form action="" className="form" method="" onSubmit={submitSignUp}>
                   <CardHeader className="text-center">
-                    {/* <div className="logo-container">
-                      <img
-                        alt="..."
-                        src={require("assets/img/now-logo.png")}
-                      ></img>
-                    </div> */}
                     <h1 className="h1-seo" style={{fontWeight: 700, fontSize: "300%"}}>TRIPPIN'</h1>
                   </CardHeader>
                   <CardBody>

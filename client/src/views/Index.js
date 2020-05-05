@@ -1,14 +1,8 @@
 import React from "react";
 
-// reactstrap components
-// import {
-// } from "reactstrap";
-
 // core components
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 import IndexHeader from "components/Headers/IndexHeader.js";
-
-// sections for this page
 
 import Carousel from "./index-sections/Carousel.js";
 

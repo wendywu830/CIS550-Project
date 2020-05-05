@@ -331,7 +331,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
   render() {    
     let itinSelector = <> </>;
-    if (this.state.iconPills === "1" || this.state.iconPills === "4") {
+    if (this.state.iconPills === "1" || this.state.iconPills === "4" || this.state.iconPills === "2") {
       itinSelector = <Row>
           <Col sm="2">
           <FormControl as="select" value={this.state.value} onChange={this.handleChange} style={{margin: "12px"}}>
