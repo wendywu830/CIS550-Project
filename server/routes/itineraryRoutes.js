@@ -317,8 +317,7 @@ function deleteItinerary(req, res) {
           connection.execute(query, binds, function(err, result) {
             if (err) {console.log(err);}
             else {
-              console.log(result)
-              res.json(result.rows)
+              res.json(result)
             }
           });
         }
