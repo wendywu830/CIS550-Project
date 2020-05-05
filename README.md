@@ -22,10 +22,6 @@ npm install react-scripts --save
 ```
 in the client folder
 
-## Built With
-
-* [Node JS](https://nodejs.org/en/docs/) - Backend, Web App, and REST API
-
 ## Authors
 
 * **Allison Zhang** - [alzhang99](https://github.com/alzhang99)
