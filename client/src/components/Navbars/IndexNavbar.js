@@ -13,8 +13,6 @@ import {
   NavLink,
   Nav,
   Container,
-  UncontrolledTooltip,
-  Button
 } from "reactstrap";
 
 function logout() {

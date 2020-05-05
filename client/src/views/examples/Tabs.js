@@ -10,8 +10,6 @@ import {
   Nav,
   TabContent,
   TabPane,
-  Container,
-  Row,
   Col,
   Button
 } from "reactstrap";

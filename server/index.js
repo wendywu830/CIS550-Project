@@ -1,5 +1,3 @@
-const cookieParser = require('cookie-parser');
-
 const bodyParser = require('body-parser');
 const express = require('express');
 var userRoutes = require('./routes/userRoutes.js');
@@ -13,16 +11,12 @@ app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-app.use(cookieParser('secret'));
-
 /* ---------------------------------------------------------------- */
 /* ------------------- Route handler registration ----------------- */
 /* ---------------------------------------------------------------- */
 
 //User Routes
 //TODO: Which of these do you want
-app.get('/people', userRoutes.getAllCustomers);
-app.get('/getAllCustomers', userRoutes.getAllCustomers);
 app.get('/checklogin/:email/:password', userRoutes.checkLogin)
 app.post('/sign-up', userRoutes.signUp);
 

@@ -6,9 +6,6 @@ import { MDBDataTable } from 'mdbreact';
 import {
   Button,
   Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
   Form,
   Input,
   InputGroupAddon,
