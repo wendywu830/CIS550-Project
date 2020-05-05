@@ -256,7 +256,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                   <option value="Shopping" name="shopping">Shopping</option>
                   <option value="Nightlife" name="nightlife">Nightlife</option>
                   <option value="Arts and Entertainment" name="art">Active Life</option>
-                  <option value="Arts and Entertainment" name="art">Breweries</option>
+                  <option value="Breweries" name="art">Breweries</option>
                 </FormControl>
               </Col>
               <Col sm="1.5">

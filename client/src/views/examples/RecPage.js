@@ -48,6 +48,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     this.searchMysteryDest = this.searchMysteryDest.bind(this)
     this.searchFoodDest  = this.searchFoodDest.bind(this)
 
+    this.searchRecBusiness = this.searchRecBusiness.bind(this)
   }
 
   addToItinerary(e) {
@@ -162,10 +163,10 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
     });
   }
 
-  searchSuggest(e) {
+  searchRecBusiness(e) {
     e.preventDefault();
 
-    fetch("http://localhost:8082/searchSuggest/" + this.state.email,
+    fetch("http://localhost:8082/searchRecBusiness/" + this.state.email,
     {
       method: "GET",
     }).then(res => {
@@ -176,9 +177,9 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
       var resultTable = []
       for (let ind in result) {
         var elt = result[ind]
-        var biz_id = elt.B_ID
-        resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.BUSINESS_NAME}/>, 
-        business: elt.BUSINESS_NAME, address: elt.ADDRESS, stars: elt.STARS})
+        var biz_id = elt.BUSINESS_ID
+        resultTable.push({check: <Input type="checkbox" name={biz_id} value={elt.NAME}/>, 
+        business: elt.NAME, city: elt.CITY, stars: elt.STARS})
       }
 
       let cols = [
@@ -189,6 +190,11 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
       {
         label: "TRIPPIN'™ Approved Business",
         field: 'business',
+        sort: 'asc'
+      },
+      {
+        label: "City",
+        field: 'city',
         sort: 'asc'
       },
       {
@@ -326,7 +332,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
   render() {    
     let itinSelector = <> </>;
-    if (this.state.iconPills === "1") {
+    if (this.state.iconPills === "1" || this.state.iconPills === "4") {
       itinSelector = <Row>
           <Col sm="2">
           <FormControl as="select" value={this.state.value} onChange={this.handleChange} style={{margin: "12px"}}>
@@ -422,7 +428,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                     }}
                   >
                     <i className="now-ui-icons ui-2_settings-90"></i>
-                    TBD
+                    SUGGEST
                   </NavLink>
                 </NavItem>
               </Nav>
@@ -530,7 +536,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                 </TabPane>
                 <TabPane tabId="iconPills3">
                   <p>Traveling for the food? Find the most accessible destination from your city that has the highest rated restaurants.</p>
-                  <Form className="form" onSubmit={this.searchSuggest}>
+                  <Form className="form" onSubmit={this.searchRecBusiness}>
                     <Row>
                       <Col sm="4">
                         <InputGroup className={"no-border input-lg" } >
@@ -564,24 +570,10 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                 <TabPane tabId="iconPills4">
                   <p>Based on the places you've shown interest in, here's some additional businesses you might enjoy!</p>
 
-                  <Form className="form" onSubmit={this.searchFoodDest}>
+                  <Form className="form" onSubmit={this.searchRecBusiness}>
                     <Row>
+                      <Col sm="4"></Col>
                       <Col sm="4">
-                        <InputGroup className={"no-border input-lg" } >
-                          <InputGroupAddon addonType="prepend">
-                            <InputGroupText>
-                              <i className="now-ui-icons ui-1_zoom-bold"></i>
-                            </InputGroupText>
-                          </InputGroupAddon>
-                          <Input
-                            name="source_city"
-                            placeholder="Source City"
-                            type="text"
-                            required
-                          ></Input>
-                        </InputGroup>
-                      </Col>
-                      <Col sm="1.5">
                         <Button
                           block
                           className="btn-round"
@@ -589,7 +581,7 @@ import IndexNavbar from "components/Navbars/IndexNavbar.js";
                           size="sm"
                           type="submit"
                         >
-                          Search
+                          Get my recommendations!
                         </Button >
                       </Col>
                     </Row>

@@ -168,14 +168,12 @@ function searchRecBusiness(req, res) {
           JOIN oneItinBus o
           ON b.city = o.dest_city
           WHERE b.categories LIKE '%Nightlife%'
-          OR b.categories LIKE '%Beauty and Spas%'
           OR b.categories LIKE '%Bakeries%'
           OR b.categories LIKE '%Bars%'
           OR b.categories LIKE '%Lounges%'
           OR b.categories LIKE '%Breakfast and Brunch%'
           OR b.categories LIKE '%Recreation Centers%'
           OR b.categories LIKE '%Breweries%'
-          OR b.categories LIKE '%Shopping%'
       )
       
       SELECT allBus.name, allBus.stars, allBus.business_id, allBus.city
@@ -218,5 +216,6 @@ function searchRecBusiness(req, res) {
  ***********/
 module.exports = {
   searchCityBusiness: searchCityBusiness,
-  searchCityBusinessCat: searchCityBusinessCat
+  searchCityBusinessCat: searchCityBusinessCat,
+  searchRecBusiness: searchRecBusiness
 }

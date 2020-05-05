@@ -22,7 +22,7 @@ app.post('/sign-up', userRoutes.signUp);
 //Business / BusinessRoutes 
 app.get('/search/:city/:state/:stars', businessRoutes.searchCityBusiness);
 app.get('/searchCityBusinessCat/:city/:state/:stars/:category', businessRoutes.searchCityBusinessCat);
-// app.get('/searchSuggest/:email', businessRoutes.searchSuggest)
+app.get('/searchRecBusiness/:email', businessRoutes.searchRecBusiness)
 
 //Flight routes
 app.get('/searchLayoverCategoryBusiness/:source_city/:dest_city/:category', flightRoutes.searchLayoverCategoryBusiness);
