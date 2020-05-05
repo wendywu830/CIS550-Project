@@ -1,14 +1,6 @@
-# TITLE OF OUT PROJECT (CIS 450)
+# TRIPPIN' (CIS 450 Final Project)
 
-An app that 
-
-## Getting Started
-
-Git clone this to start
-
-### Prerequisites
-
-Node.js and maybe SQL stuff
+Just Trippin allows each user to have their own personally tailored suggestions and recommendations for flights to and from specific locations as well as points of interest in these locations. Users can store combinations of these as itineraries, creating their own experiences. 
 
 ### Installing
 
@@ -34,11 +26,8 @@ in the client folder
 
 * [Node JS](https://nodejs.org/en/docs/) - Backend, Web App, and REST API
 
-## Database Schema
-![alt text](https://raw.githubusercontent.com/wendywu830/CIS550-Project/master/MS2%20ER%20Diagram.png?token=AD6XYBYPMQPY3MQHB2INI6C6Q2P36 "ER Diagram")
-
 ## Authors
 
-* **Allison Zhang** - *Planning In Progress* - [alzhang99](https://github.com/alzhang99)
-* **Derek He** - *Planning In Progress* - [DerekHeYellow](https://github.com/DerekHeYellow)
-* **Wendy Wu** - *Planning In Progress* - [wendywu830](https://github.com/wendywu830)
+* **Allison Zhang** - [alzhang99](https://github.com/alzhang99)
+* **Derek He** - [DerekHeYellow](https://github.com/DerekHeYellow)
+* **Wendy Wu** - [wendywu830](https://github.com/wendywu830)
