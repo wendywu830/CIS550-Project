@@ -1,4 +1,4 @@
-# TRIPPIN' (CIS 450 Final Project)
+# TRIPPIN'
 
 Trippin' allows each user to have their own personally tailored suggestions and recommendations for flights to and from specific locations as well as points of interest in these locations. Users can store combinations of these as itineraries, creating their own experiences. 
 
