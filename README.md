@@ -1,10 +1,11 @@
 # TRIPPIN' (CIS 450 Final Project)
 
-Just Trippin allows each user to have their own personally tailored suggestions and recommendations for flights to and from specific locations as well as points of interest in these locations. Users can store combinations of these as itineraries, creating their own experiences. 
+Trippin' allows each user to have their own personally tailored suggestions and recommendations for flights to and from specific locations as well as points of interest in these locations. Users can store combinations of these as itineraries, creating their own experiences. 
 
 ### Installing
+First, fill in the correct credentials in server/credentials.json.
 
-In your terminal, cd into both server and client folders and run
+Then, in your terminal, cd into both server and client folders and run
 ```
 npm install
 ```
